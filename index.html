@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Wordsara Creator</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;700&display=swap"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind:wght@400;700&display=swap"/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Hind:wght@400;700&family=Mukta:wght@400;700&family=Poppins:wght@400;700&display=swap"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     * {
@@ -44,58 +41,13 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     }
 
-    .app-bar .settings-icon {
+    .app-bar i {
       cursor: pointer;
       transition: transform 0.3s;
     }
 
-    .app-bar .settings-icon:hover {
+    .app-bar i:hover {
       transform: rotate(90deg);
-    }
-
-    .dropdown-menu {
-      background-color: #2a2a2a;
-      border: 1px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 0.5rem;
-      min-width: 220px;
-    }
-
-    .dropdown-menu .form-select,
-    .dropdown-menu .form-control {
-      background-color: #3a3a3a;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0.5rem;
-    }
-
-    .dropdown-menu .form-select:focus,
-    .dropdown-menu .form-control:focus {
-      border-color: #10a37f;
-      box-shadow: 0 0 5px rgba(16, 163, 127, 0.5);
-    }
-
-    .dropdown-menu .form-label {
-      font-size: 0.9rem;
-      color: #e0e0e0;
-      margin-bottom: 0.25rem;
-    }
-
-    .color-picker-container {
-      display: flex;
-      justify-content: center;
-      padding: 0.5rem 0;
-    }
-
-    .iro-color-picker {
-      transform: scale(0.8);
-    }
-
-    .hex-input {
-      width: 100%;
-      margin-top: 0.25rem;
-      font-size: 0.9rem;
     }
 
     .main-container {
@@ -164,7 +116,7 @@
     .preview-container {
       max-width: 360px;
       aspect-ratio: 9 / 16;
-      background: linear-gradient(135deg, #000, #1a1a1a);
+      background: #000000;
       margin: 0 auto;
       position: relative;
       overflow: hidden;
@@ -176,24 +128,6 @@
       padding: 30px 14px 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       border: 1px solid #3a3a3a;
-      background-size: cover;
-      background-position: center;
-    }
-
-    .preview-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .preview-container > * {
-      position: relative;
-      z-index: 1;
     }
 
     .author-img-wrapper {
@@ -271,62 +205,60 @@
     .form-check-label {
       color: #e0e0e0;
     }
+
+    .dropdown-menu {
+      background-color: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 0.5rem;
+      min-width: 220px;
+    }
+
+    .dropdown-item {
+      color: #e0e0e0;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-item:hover {
+      background-color: #3a3a3a;
+      color: #ffffff;
+    }
+
+    .dropdown-form-group {
+      padding: 0.5rem 1rem;
+    }
   </style>
 </head>
 <body>
   <div class="app-bar">
     <span><i class="fa-solid fa-pen-nib me-2"></i>Wordsara Creator</span>
     <div class="dropdown">
-      <i class="fa fa-cog settings-icon" data-bs-toggle="dropdown" aria-expanded="false"></i>
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li class="px-2 mb-2">
+      <i class="fa fa-cog" id="settingsIcon" data-bs-toggle="dropdown" aria-expanded="false"></i>
+      <div class="dropdown-menu" aria-labelledby="settingsIcon">
+        <div class="dropdown-form-group">
           <label for="fontFamilySelect" class="form-label">Font Family</label>
           <select class="form-select" id="fontFamilySelect">
             <option value="'Noto Sans Devanagari', sans-serif" selected>Noto Sans Devanagari</option>
-            <option value="'Mukta', sans-serif">Mukta</option>
             <option value="'Hind', sans-serif">Hind</option>
+            <option value="'Mukta', sans-serif">Mukta</option>
             <option value="'Poppins', sans-serif">Poppins</option>
           </select>
-        </li>
-        <li class="px-2 mb-2">
-          <label class="form-label">Background Color</label>
-          <div class="color-picker-container" id="backgroundColorPicker"></div>
-          <input type="text" class="form-control hex-input" id="backgroundHexInput" placeholder="#HEX" maxlength="7" />
-        </li>
-        <li class="px-2 mb-2">
-          <label for="textColorSelect" class="form-label">Text Color</label>
-          <select class="form-select" id="textColorSelect">
-            <option value="#ffffff" selected>White</option>
-            <option value="#ff0000">Red</option>
-            <option value="#00ff00">Green</option>
-            <option value="#0000ff">Blue</option>
-            <option value="#ffff00">Yellow</option>
-            <option value="#ff00ff">Magenta</option>
-            <option value="#00ffff">Cyan</option>
-          </select>
-          <input type="text" class="form-control hex-input" id="textHexInput" placeholder="#HEX" maxlength="7" />
-        </li>
-        <li class="px-2 mb-2">
-          <label for="overlayColorPicker" class="form-label">Overlay Color</label>
-          <input type="color" class="form-control form-control-color" id="overlayColorPicker" title="Choose Overlay Color" />
-        </li>
-        <li class="px-2">
-          <label for="backgroundImageUpload" class="form-label">Background Image</label>
-          <input type="file" class="form-control" id="backgroundImageUpload" accept="image/*" />
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="main-container">
     <div class="form-section">
       <div class="mb-4">
-        <label for="textInput" class="form-label">Enter Your Text Here</label>
+        <label for="textInput" class="form-label">अपना टेक्स्ट यहाँ लिखें</label>
         <textarea class="form-control" id="textInput" rows="4">लोग कहते है कुछ अपने दिल की सुनाओ यहाँ दिल की खुद ही को समझ नहीं आ रही औरो को क्या सुनाए !!</textarea>
       </div>
 
       <div class="mb-4">
-        <label for="authorInput" class="form-label">Author / Source (Optional)</label>
+        <label for="authorInput" class="form-label">Author / Source (optional)</label>
         <input type="text" class="form-control" id="authorInput" />
       </div>
 
@@ -388,76 +320,37 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5.5.2/dist/iro.min.js"></script>
   <script>
-    let backgroundColor = null; // Store selected background color
-    let textColor = "#ffffff"; // Store selected text color, default to white
-
     function updatePreview() {
       const text = document.getElementById("textInput").value;
       const author = document.getElementById("authorInput").value;
       const fontSize = parseInt(document.getElementById("fontSizeSelect").value);
-      const fontFamily = document.getElementById("fontFamilySelect").value;
       const isBold = document.getElementById("boldToggle").checked;
       const isItalic = document.getElementById("italicToggle").checked;
-      const overlayColor = document.getElementById("overlayColorPicker").value;
-      const backgroundImage = document.getElementById("backgroundImageUpload").files[0];
+      const fontFamily = document.getElementById("fontFamilySelect").value;
 
-      const previewContainer = document.getElementById("preview");
       const previewText = document.getElementById("previewText");
       previewText.innerText = text;
       previewText.style.fontSize = fontSize + "px";
-      previewText.style.fontFamily = fontFamily;
       previewText.style.fontWeight = isBold ? "bold" : "normal";
       previewText.style.fontStyle = isItalic ? "italic" : "normal";
-      previewText.style.color = textColor; // Apply text color
+      previewText.style.fontFamily = fontFamily;
 
       const previewAuthor = document.getElementById("previewAuthor");
       previewAuthor.innerText = author ? `~ ${author}` : "";
       previewAuthor.style.fontSize = (fontSize - 4) + "px";
       previewAuthor.style.fontFamily = fontFamily;
-      previewAuthor.style.color = textColor; // Apply text color to author
-
-      // Handle background (priority: color > image > default gradient)
-      if (backgroundColor && backgroundColor !== "#000000") {
-        previewContainer.style.background = backgroundColor;
-        previewContainer.style.backgroundImage = "none"; // Clear image if color is selected
-      } else if (backgroundImage) {
-        const reader = new FileReader();
-        reader.onloadend = function () {
-          previewContainer.style.background = `url(${reader.result})`;
-          previewContainer.style.backgroundSize = "cover";
-          previewContainer.style.backgroundPosition = "center";
-        };
-        reader.readAsDataURL(backgroundImage);
-      } else {
-        previewContainer.style.background = "linear-gradient(135deg, #000, #1a1a1a)";
-        previewContainer.style.backgroundImage = "none";
-      }
-
-      // Handle overlay color
-      if (overlayColor && overlayColor !== "#000000") {
-        const hex = overlayColor.replace("#", "");
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-        previewContainer.style.setProperty('--overlay-color', `rgba(${r}, ${g}, ${b}, 0.5)`);
-        previewContainer.classList.add("has-overlay");
-      } else {
-        previewContainer.classList.remove("has-overlay");
-        previewContainer.style.setProperty('--overlay-color', 'transparent');
-      }
 
       const authorImg = document.getElementById("authorImgPreview");
-      const authorFile = document.getElementById("authorImageUpload").files[0];
+      const file = document.getElementById("authorImageUpload").files[0];
 
-      if (authorFile) {
+      if (file) {
         const reader = new FileReader();
         reader.onloadend = function () {
           authorImg.src = reader.result;
           authorImg.style.display = "block";
         };
-        reader.readAsDataURL(authorFile);
+        reader.readAsDataURL(file);
       } else {
         authorImg.src = "";
         authorImg.style.display = "none";
@@ -491,87 +384,14 @@
       });
     }
 
-    // Initialize circular color picker for background
-    const colorPicker = new iro.ColorPicker("#backgroundColorPicker", {
-      width: 180,
-      layout: [
-        {
-          component: iro.ui.Wheel,
-          options: {}
-        }
-      ]
-    });
-
-    const backgroundHexInput = document.getElementById("backgroundHexInput");
-
-    // Sync background picker with hex input
-    colorPicker.on('color:change', function(color) {
-      backgroundColor = color.hexString;
-      backgroundHexInput.value = color.hexString;
-      updatePreview();
-    });
-
-    // Sync background hex input with picker
-    backgroundHexInput.addEventListener("input", function() {
-      const value = backgroundHexInput.value.trim();
-      if (/^#[0-9A-Fa-f]{6}$/.test(value)) { // Validate 6-digit hex code
-        backgroundColor = value;
-        colorPicker.color.hexString = value;
-        updatePreview();
-      } else if (value === "" || value === "#") {
-        backgroundColor = null;
-        colorPicker.color.hexString = "#000000"; // Reset picker visually
-        updatePreview();
-      }
-    });
-
-    // Text color selection
-    const textColorSelect = document.getElementById("textColorSelect");
-    const textHexInput = document.getElementById("textHexInput");
-
-    // Initialize text hex input with default color
-    textHexInput.value = textColor;
-
-    // Sync text color select with preview
-    textColorSelect.addEventListener("change", function() {
-      textColor = textColorSelect.value;
-      textHexInput.value = textColor;
-      updatePreview();
-    });
-
-    // Sync text hex input with preview
-    textHexInput.addEventListener("input", function() {
-      const value = textHexInput.value.trim();
-      if (/^#[0-9A-Fa-f]{6}$/.test(value)) { // Validate 6-digit hex code
-        textColor = value;
-        textColorSelect.value = value; // Update select if matching
-        updatePreview();
-      } else if (value === "" || value === "#") {
-        textColor = "#ffffff"; // Reset to default white
-        textColorSelect.value = "#ffffff";
-        updatePreview();
-      }
-    });
-
-    // Dynamic CSS for overlay
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = `
-      .preview-container.has-overlay::before {
-        background-color: var(--overlay-color);
-      }
-    `;
-    document.head.appendChild(styleSheet);
-
     // Real-time Preview Trigger
     document.getElementById("textInput").addEventListener("input", updatePreview);
     document.getElementById("authorInput").addEventListener("input", updatePreview);
-    document.getElementById("fontFamilySelect").addEventListener("change", updatePreview);
     document.getElementById("fontSizeSelect").addEventListener("change", updatePreview);
     document.getElementById("boldToggle").addEventListener("change", updatePreview);
     document.getElementById("italicToggle").addEventListener("change", updatePreview);
     document.getElementById("authorImageUpload").addEventListener("change", updatePreview);
-    document.getElementById("overlayColorPicker").addEventListener("input", updatePreview);
-    document.getElementById("backgroundImageUpload").addEventListener("change", updatePreview);
+    document.getElementById("fontFamilySelect").addEventListener("change", updatePreview);
 
     updatePreview(); // Initial render
   </script>
