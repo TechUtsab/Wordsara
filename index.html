@@ -128,6 +128,8 @@
       padding: 30px 14px 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       border: 1px solid #3a3a3a;
+      background-size: cover;
+      background-position: center;
     }
 
     .author-img-wrapper {
@@ -148,7 +150,6 @@
     }
 
     .preview-text {
-      color: white;
       text-align: center;
       white-space: pre-wrap;
       width: 100%;
@@ -163,7 +164,6 @@
       margin: 10px 14px 0 auto;
       text-align: right;
       text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-      color: #d3d3d3;
     }
 
     .preview-logo {
@@ -229,6 +229,30 @@
     .dropdown-form-group {
       padding: 0.5rem 1rem;
     }
+
+    #backgroundColorPicker {
+      margin: 0.5rem auto;
+      display: block;
+    }
+
+    #hexColorInput, #backgroundImageUpload, #textColorHexInput {
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 0.5rem;
+      width: 100%;
+    }
+
+    #hexColorInput:focus, #backgroundImageUpload:focus, #textColorHexInput:focus {
+      border-color: #10a37f;
+      box-shadow: 0 0 5px rgba(16, 163, 127, 0.5);
+      outline: none;
+    }
+
+    #hexColorInput, #textColorHexInput {
+      text-transform: uppercase;
+    }
   </style>
 </head>
 <body>
@@ -246,6 +270,27 @@
             <option value="'Poppins', sans-serif">Poppins</option>
           </select>
         </div>
+        <div class="dropdown-form-group">
+          <label for="backgroundColorPicker" class="form-label">Background Color</label>
+          <div id="backgroundColorPicker"></div>
+          <input type="text" id="hexColorInput" class="form-control mt-2" placeholder="#000000" maxlength="7" />
+          <label for="backgroundImageUpload" class="form-label mt-2">Background Image Upload</label>
+          <input type="file" id="backgroundImageUpload" class="form-control" accept="image/*" />
+        </div>
+        <div class="dropdown-form-group">
+          <label for="textColorSelect" class="form-label">Text Color</label>
+          <select class="form-select" id="textColorSelect">
+            <option value="#FFFFFF" selected>White (#FFFFFF)</option>
+            <option value="#000000">Black (#000000)</option>
+            <option value="#FF0000">Red (#FF0000)</option>
+            <option value="#0000FF">Blue (#0000FF)</option>
+            <option value="#00FF00">Green (#00FF00)</option>
+            <option value="#FFFF00">Yellow (#FFFF00)</option>
+            <option value="#800080">Purple (#800080)</option>
+          </select>
+          <label for="textColorHexInput" class="form-label mt-2">Custom Text Color (Hex)</label>
+          <input type="text" id="textColorHexInput" class="form-control mt-2" placeholder="#FFFFFF" maxlength="7" />
+        </div>
       </div>
     </div>
   </div>
@@ -253,8 +298,8 @@
   <div class="main-container">
     <div class="form-section">
       <div class="mb-4">
-        <label for="textInput" class="form-label">अपना टेक्स्ट यहाँ लिखें</label>
-        <textarea class="form-control" id="textInput" rows="4">लोग कहते है कुछ अपने दिल की सुनाओ यहाँ दिल की खुद ही को समझ नहीं आ रही औरो को क्या सुनाए !!</textarea>
+        <label for="textInput" class="form-label">अपना टेक्स्ट यहाँ लिखें (Highlight: [color=#FF0000]word[/color])</label>
+        <textarea class="form-control" id="textInput" rows="4">लोग कहते है [color=#FF0000]कुछ[/color] अपने दिल की सुनाओ यहाँ दिल की खुद ही को समझ नहीं आ रही औरो को क्या सुनाए !!</textarea>
       </div>
 
       <div class="mb-4">
@@ -304,6 +349,7 @@
       </div>
 
       <div class="mb-4 d-flex gap-2">
+        <button class="btn btn-custom w-100" onclick="clearAllData()">Clear All Data</button>
         <button class="btn btn-custom w-100" onclick="downloadImage()">Download Image</button>
       </div>
     </div>
@@ -320,7 +366,24 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
   <script>
+    // Initialize iro.js Color Picker for background
+    const colorPicker = new iro.ColorPicker("#backgroundColorPicker", {
+      width: 180,
+      layout: [{ component: iro.ui.Wheel, options: {} }],
+      color: "#000000" // Set initial background color to black
+    });
+
+    let backgroundImageUrl = null; // Store the uploaded background image URL
+
+    function parseTextForColors(text, defaultColor) {
+      const regex = /\[color=(#[0-9A-Fa-f]{6})\](.*?)\[\/color\]/g;
+      let formattedText = text.replace(regex, '<span style="color: $1">$2</span>');
+      formattedText = `<span style="color: ${defaultColor}">${formattedText}</span>`;
+      return formattedText;
+    }
+
     function updatePreview() {
       const text = document.getElementById("textInput").value;
       const author = document.getElementById("authorInput").value;
@@ -328,19 +391,49 @@
       const isBold = document.getElementById("boldToggle").checked;
       const isItalic = document.getElementById("italicToggle").checked;
       const fontFamily = document.getElementById("fontFamilySelect").value;
+      const backgroundColor = colorPicker.color.hexString;
+      const textColorSelect = document.getElementById("textColorSelect").value;
+      const textColorHexInput = document.getElementById("textColorHexInput").value.trim();
 
+      const previewContainer = document.getElementById("preview");
       const previewText = document.getElementById("previewText");
-      previewText.innerText = text;
+      const previewAuthor = document.getElementById("previewAuthor");
+      const hexColorInput = document.getElementById("hexColorInput");
+
+      // Apply background: image if uploaded, otherwise solid color
+      if (backgroundImageUrl) {
+        previewContainer.style.background = `url(${backgroundImageUrl})`;
+        previewContainer.style.backgroundSize = "cover";
+        previewContainer.style.backgroundPosition = "center";
+      } else {
+        previewContainer.style.background = backgroundColor;
+        previewContainer.style.backgroundSize = ""; // Reset if no image
+        previewContainer.style.backgroundPosition = ""; // Reset if no image
+      }
+
+      // Update hex input for background color
+      hexColorInput.value = backgroundColor.toUpperCase();
+
+      // Determine default text color
+      let defaultTextColor = textColorSelect;
+      if (textColorHexInput && /^#?[0-9A-Fa-f]{6}$/.test(textColorHexInput)) {
+        defaultTextColor = textColorHexInput.startsWith("#") ? textColorHexInput : "#" + textColorHexInput;
+      }
+
+      // Update preview text with color parsing
+      previewText.innerHTML = parseTextForColors(text, defaultTextColor);
       previewText.style.fontSize = fontSize + "px";
       previewText.style.fontWeight = isBold ? "bold" : "normal";
       previewText.style.fontStyle = isItalic ? "italic" : "normal";
       previewText.style.fontFamily = fontFamily;
 
-      const previewAuthor = document.getElementById("previewAuthor");
+      // Update preview author
       previewAuthor.innerText = author ? `~ ${author}` : "";
       previewAuthor.style.fontSize = (fontSize - 4) + "px";
       previewAuthor.style.fontFamily = fontFamily;
+      previewAuthor.style.color = defaultTextColor;
 
+      // Update author image
       const authorImg = document.getElementById("authorImgPreview");
       const file = document.getElementById("authorImageUpload").files[0];
 
@@ -356,6 +449,92 @@
         authorImg.style.display = "none";
       }
     }
+
+    function clearAllData() {
+      // Clear text and author inputs
+      document.getElementById("textInput").value = "";
+      document.getElementById("authorInput").value = "";
+
+      // Clear file inputs
+      document.getElementById("authorImageUpload").value = "";
+      document.getElementById("backgroundImageUpload").value = "";
+      backgroundImageUrl = null;
+
+      // Reset font size to default (16px)
+      document.getElementById("fontSizeSelect").value = "16";
+
+      // Reset bold and italic toggles
+      document.getElementById("boldToggle").checked = false;
+      document.getElementById("italicToggle").checked = false;
+
+      // Reset frame size to reels
+      const reelIcon = document.querySelector(".size-icon.fa-mobile-screen-button");
+      setFrameSize("reel", reelIcon);
+
+      // Reset font family to Noto Sans Devanagari
+      document.getElementById("fontFamilySelect").value = "'Noto Sans Devanagari', sans-serif";
+
+      // Reset background color to black
+      colorPicker.color.hexString = "#000000";
+      document.getElementById("hexColorInput").value = "#000000";
+
+      // Reset text color to white
+      document.getElementById("textColorSelect").value = "#FFFFFF";
+      document.getElementById("textColorHexInput").value = "#FFFFFF";
+
+      // Update preview
+      updatePreview();
+    }
+
+    // Sync background color picker with hex input
+    colorPicker.on('color:change', function(color) {
+      if (!backgroundImageUrl) {
+        document.getElementById("preview").style.background = color.hexString;
+      }
+      document.getElementById("hexColorInput").value = color.hexString.toUpperCase();
+    });
+
+    // Handle background hex color input
+    document.getElementById("hexColorInput").addEventListener("input", function() {
+      let hex = this.value.trim();
+      if (/^#?[0-9A-Fa-f]{6}$/.test(hex)) {
+        if (!hex.startsWith("#")) {
+          hex = "#" + hex;
+        }
+        colorPicker.color.hexString = hex;
+        if (!backgroundImageUrl) {
+          document.getElementById("preview").style.background = hex;
+        }
+      }
+    });
+
+    // Handle background image upload
+    document.getElementById("backgroundImageUpload").addEventListener("change", function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = function() {
+          backgroundImageUrl = reader.result;
+          document.getElementById("preview").style.background = `url(${backgroundImageUrl})`;
+          document.getElementById("preview").style.backgroundSize = "cover";
+          document.getElementById("preview").style.backgroundPosition = "center";
+          updatePreview();
+        };
+        reader.readAsDataURL(file);
+      } else {
+        backgroundImageUrl = null;
+        updatePreview();
+      }
+    });
+
+    // Handle text color selection and hex input
+    document.getElementById("textColorSelect").addEventListener("change", updatePreview);
+    document.getElementById("textColorHexInput").addEventListener("input", function() {
+      const hex = this.value.trim();
+      if (/^#?[0-9A-Fa-f]{6}$/.test(hex)) {
+        updatePreview();
+      }
+    });
 
     function setFrameSize(size, iconElement) {
       const container = document.getElementById("preview");
