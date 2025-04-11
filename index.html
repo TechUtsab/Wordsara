@@ -253,6 +253,14 @@
     #hexColorInput, #textColorHexInput {
       text-transform: uppercase;
     }
+
+    /* Add scrollbar for smaller screens */
+    @media (max-width: 768px) {
+      .dropdown-menu {
+        max-height: 50vh; /* Limit height to 50% of viewport height */
+        overflow-y: auto; /* Enable vertical scrollbar when content overflows */
+      }
+    }
   </style>
 </head>
 <body>
@@ -451,38 +459,21 @@
     }
 
     function clearAllData() {
-      // Clear text and author inputs
       document.getElementById("textInput").value = "";
       document.getElementById("authorInput").value = "";
-
-      // Clear file inputs
       document.getElementById("authorImageUpload").value = "";
       document.getElementById("backgroundImageUpload").value = "";
       backgroundImageUrl = null;
-
-      // Reset font size to default (16px)
       document.getElementById("fontSizeSelect").value = "16";
-
-      // Reset bold and italic toggles
       document.getElementById("boldToggle").checked = false;
       document.getElementById("italicToggle").checked = false;
-
-      // Reset frame size to reels
       const reelIcon = document.querySelector(".size-icon.fa-mobile-screen-button");
       setFrameSize("reel", reelIcon);
-
-      // Reset font family to Noto Sans Devanagari
       document.getElementById("fontFamilySelect").value = "'Noto Sans Devanagari', sans-serif";
-
-      // Reset background color to black
       colorPicker.color.hexString = "#000000";
       document.getElementById("hexColorInput").value = "#000000";
-
-      // Reset text color to white
       document.getElementById("textColorSelect").value = "#FFFFFF";
       document.getElementById("textColorHexInput").value = "#FFFFFF";
-
-      // Update preview
       updatePreview();
     }
 
