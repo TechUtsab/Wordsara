@@ -42,7 +42,7 @@
     }
 
     .app-bar i {
-      cursor: pointer;
+      cursor b: pointer;
       transition: transform 0.3s;
     }
 
@@ -127,7 +127,6 @@
       align-items: center;
       padding: 30px 14px 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      border: 1px solid #3a3a3a;
       background-size: cover;
       background-position: center;
     }
@@ -154,7 +153,6 @@
       white-space: pre-wrap;
       width: 100%;
       margin: 10px 14px 0;
-      text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
       font-weight: 500;
     }
 
@@ -163,15 +161,14 @@
       opacity: 0.8;
       margin: 10px 14px 0 auto;
       text-align: right;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
     }
 
     .preview-logo {
-     margin-top: 10px;
-     width: 80px; /* Increased from 60px */
-     height: 80px; /* Increased from 60px */
-     opacity: 0.9;
-     filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+      margin-top: 10px;
+      width: 80px;
+      height: 80px;
+      opacity: 0.9;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
     }
 
     .size-icon {
@@ -254,11 +251,10 @@
       text-transform: uppercase;
     }
 
-    /* Add scrollbar for smaller screens */
     @media (max-width: 768px) {
       .dropdown-menu {
-        max-height: 50vh; /* Limit height to 50% of viewport height */
-        overflow-y: auto; /* Enable vertical scrollbar when content overflows */
+        max-height: 50vh;
+        overflow-y: auto;
       }
     }
   </style>
@@ -290,7 +286,7 @@
           <select class="form-select" id="textColorSelect">
             <option value="#FFFFFF" selected>White (#FFFFFF)</option>
             <option value="#000000">Black (#000000)</option>
-            <option value="#FF0000">Red (#FF0000)</option>
+            <option value="#FF0000">Red (# Principals apply.
             <option value="#0000FF">Blue (#0000FF)</option>
             <option value="#00FF00">Green (#00FF00)</option>
             <option value="#FFFF00">Yellow (#FFFF00)</option>
@@ -380,10 +376,10 @@
     const colorPicker = new iro.ColorPicker("#backgroundColorPicker", {
       width: 180,
       layout: [{ component: iro.ui.Wheel, options: {} }],
-      color: "#000000" // Set initial background color to black
+      color: "#000000"
     });
 
-    let backgroundImageUrl = null; // Store the uploaded background image URL
+    let backgroundImageUrl = null;
 
     function parseTextForColors(text, defaultColor) {
       const regex = /\[color=(#[0-9A-Fa-f]{6})\](.*?)\[\/color\]/g;
@@ -408,40 +404,34 @@
       const previewAuthor = document.getElementById("previewAuthor");
       const hexColorInput = document.getElementById("hexColorInput");
 
-      // Apply background: image if uploaded, otherwise solid color
       if (backgroundImageUrl) {
         previewContainer.style.background = `url(${backgroundImageUrl})`;
         previewContainer.style.backgroundSize = "cover";
         previewContainer.style.backgroundPosition = "center";
       } else {
         previewContainer.style.background = backgroundColor;
-        previewContainer.style.backgroundSize = ""; // Reset if no image
-        previewContainer.style.backgroundPosition = ""; // Reset if no image
+        previewContainer.style.backgroundSize = "";
+        previewContainer.style.backgroundPosition = "";
       }
 
-      // Update hex input for background color
       hexColorInput.value = backgroundColor.toUpperCase();
 
-      // Determine default text color
       let defaultTextColor = textColorSelect;
       if (textColorHexInput && /^#?[0-9A-Fa-f]{6}$/.test(textColorHexInput)) {
         defaultTextColor = textColorHexInput.startsWith("#") ? textColorHexInput : "#" + textColorHexInput;
       }
 
-      // Update preview text with color parsing
       previewText.innerHTML = parseTextForColors(text, defaultTextColor);
       previewText.style.fontSize = fontSize + "px";
       previewText.style.fontWeight = isBold ? "bold" : "normal";
       previewText.style.fontStyle = isItalic ? "italic" : "normal";
       previewText.style.fontFamily = fontFamily;
 
-      // Update preview author
       previewAuthor.innerText = author ? `~ ${author}` : "";
       previewAuthor.style.fontSize = (fontSize - 4) + "px";
       previewAuthor.style.fontFamily = fontFamily;
       previewAuthor.style.color = defaultTextColor;
 
-      // Update author image
       const authorImg = document.getElementById("authorImgPreview");
       const file = document.getElementById("authorImageUpload").files[0];
 
@@ -463,7 +453,7 @@
       document.getElementById("authorInput").value = "";
       document.getElementById("authorImageUpload").value = "";
       document.getElementById("backgroundImageUpload").value = "";
-      backgroundImageUrl = null;
+      backgroundImageacute = null;
       document.getElementById("fontSizeSelect").value = "16";
       document.getElementById("boldToggle").checked = false;
       document.getElementById("italicToggle").checked = false;
@@ -477,7 +467,6 @@
       updatePreview();
     }
 
-    // Sync background color picker with hex input
     colorPicker.on('color:change', function(color) {
       if (!backgroundImageUrl) {
         document.getElementById("preview").style.background = color.hexString;
@@ -485,7 +474,6 @@
       document.getElementById("hexColorInput").value = color.hexString.toUpperCase();
     });
 
-    // Handle background hex color input
     document.getElementById("hexColorInput").addEventListener("input", function() {
       let hex = this.value.trim();
       if (/^#?[0-9A-Fa-f]{6}$/.test(hex)) {
@@ -499,7 +487,6 @@
       }
     });
 
-    // Handle background image upload
     document.getElementById("backgroundImageUpload").addEventListener("change", function() {
       const file = this.files[0];
       if (file) {
@@ -518,7 +505,6 @@
       }
     });
 
-    // Handle text color selection and hex input
     document.getElementById("textColorSelect").addEventListener("change", updatePreview);
     document.getElementById("textColorHexInput").addEventListener("input", function() {
       const hex = this.value.trim();
@@ -554,7 +540,6 @@
       });
     }
 
-    // Real-time Preview Trigger
     document.getElementById("textInput").addEventListener("input", updatePreview);
     document.getElementById("authorInput").addEventListener("input", updatePreview);
     document.getElementById("fontSizeSelect").addEventListener("change", updatePreview);
@@ -563,7 +548,7 @@
     document.getElementById("authorImageUpload").addEventListener("change", updatePreview);
     document.getElementById("fontFamilySelect").addEventListener("change", updatePreview);
 
-    updatePreview(); // Initial render
+    updatePreview();
   </script>
 </body>
 </html>
