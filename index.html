@@ -152,14 +152,14 @@
       text-align: center;
       white-space: pre-wrap;
       width: 100%;
-      margin: 10px 30px 0 30px;
+      margin: 0.625rem 1.875rem 0 1.875rem; /* 10px = 0.625rem, 30px = 1.875rem */
       font-weight: 500;
     }
 
     .preview-author {
       font-size: calc(1em - 4px);
       opacity: 0.8;
-      margin: 10px 30px 0 auto;
+      margin: 0.625rem 1.875rem 0 auto; /* 10px = 0.625rem, 30px = 1.875rem */
       text-align: right;
     }
 
@@ -344,21 +344,6 @@
       </div>
 
       <div class="mb-4">
-        <label for="textMarginLeft" class="form-label">Text Left Margin (px)</label>
-        <input type="number" class="form-control" id="textMarginLeft" value="30" min="0" max="100" />
-      </div>
-
-      <div class="mb-4">
-        <label for="textMarginRight" class="form-label">Text Right Margin (px)</label>
-        <input type="number" class="form-control" id="textMarginRight" value="30" min="0" max="100" />
-      </div>
-
-      <div class="mb-4">
-        <label for="authorMarginRight" class="form-label">Author Right Margin (px)</label>
-        <input type="number" class="form-control" id="authorMarginRight" value="30" min="0" max="100" />
-      </div>
-
-      <div class="mb-4">
         <label class="form-label">Frame Size</label>
         <div class="d-flex align-items-center">
           <i class="fa-solid fa-mobile-screen-button size-icon active" onclick="setFrameSize('reel', this)"></i>
@@ -413,9 +398,6 @@
       const backgroundColor = colorPicker.color.hexString;
       const textColorSelect = document.getElementById("textColorSelect").value;
       const textColorHexInput = document.getElementById("textColorHexInput").value.trim();
-      const textMarginLeft = parseInt(document.getElementById("textMarginLeft").value) || 30;
-      const textMarginRight = parseInt(document.getElementById("textMarginRight").value) || 30;
-      const authorMarginRight = parseInt(document.getElementById("authorMarginRight").value) || 30;
 
       const previewContainer = document.getElementById("preview");
       const previewText = document.getElementById("previewText");
@@ -440,20 +422,15 @@
       }
 
       previewText.innerHTML = parseTextForColors(text, defaultTextColor);
-      previewText.style.fontSize = `${fontSize}px`;
-      previewText.style.fontWeight = isBold ? "700" : "500";
+      previewText.style.fontSize = fontSize + "px";
+      previewText.style.fontWeight = isBold ? "bold" : "normal";
       previewText.style.fontStyle = isItalic ? "italic" : "normal";
       previewText.style.fontFamily = fontFamily;
-      previewText.style.marginLeft = `${textMarginLeft}px`;
-      previewText.style.marginRight = `${textMarginRight}px`;
 
       previewAuthor.innerText = author ? `~ ${author}` : "";
-      previewAuthor.style.fontSize = `${fontSize - 4}px`;
+      previewAuthor.style.fontSize = (fontSize - 4) + "px";
       previewAuthor.style.fontFamily = fontFamily;
       previewAuthor.style.color = defaultTextColor;
-      previewAuthor.style.marginRight = `${authorMarginRight}px`;
-      previewAuthor.style.fontWeight = isBold ? "700" : "500";
-      previewAuthor.style.fontStyle = isItalic ? "italic" : "normal";
 
       const authorImg = document.getElementById("authorImgPreview");
       const file = document.getElementById("authorImageUpload").files[0];
@@ -469,6 +446,12 @@
         authorImg.src = "";
         authorImg.style.display = "none";
       }
+
+      // Optional: Dynamic margins based on font size (uncomment to use)
+      /*
+      previewText.style.margin = `0.625rem ${fontSize * 1.875 / 16}rem 0 ${fontSize * 1.875 / 16}rem`;
+      previewAuthor.style.margin = `0.625rem ${fontSize * 1.875 / 16}rem 0 auto`;
+      */
     }
 
     function clearAllData() {
@@ -480,9 +463,6 @@
       document.getElementById("fontSizeSelect").value = "16";
       document.getElementById("boldToggle").checked = false;
       document.getElementById("italicToggle").checked = false;
-      document.getElementById("textMarginLeft").value = "30";
-      document.getElementById("textMarginRight").value = "30";
-      document.getElementById("authorMarginRight").value = "30";
       const reelIcon = document.querySelector(".size-icon.fa-mobile-screen-button");
       setFrameSize("reel", reelIcon);
       document.getElementById("fontFamilySelect").value = "'Noto Sans Devanagari', sans-serif";
@@ -566,6 +546,15 @@
       });
     }
 
-    // Add event listeners for all inputs
     document.getElementById("textInput").addEventListener("input", updatePreview);
-    document.getElementById("authorInput").addEventListener("in
+    document.getElementById("authorInput").addEventListener("input", updatePreview);
+    document.getElementById("fontSizeSelect").addEventListener("change", updatePreview);
+    document.getElementById("boldToggle").addEventListener("change", updatePreview);
+    document.getElementById("italicToggle").addEventListener("change", updatePreview);
+    document.getElementById("authorImageUpload").addEventListener("change", updatePreview);
+    document.getElementById("fontFamilySelect").addEventListener("change", updatePreview);
+
+    updatePreview();
+  </script>
+</body>
+  </html>
