@@ -42,7 +42,7 @@
     }
 
     .app-bar i {
-      cursor b: pointer;
+      cursor: pointer;
       transition: transform 0.3s;
     }
 
@@ -120,13 +120,13 @@
       margin: 0 auto;
       position: relative;
       overflow: hidden;
-      border-radius: 0;
+      border: none; /* Ensure no border */
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 30px 14px 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      box-shadow: none; /* Remove shadow for download */
       background-size: cover;
       background-position: center;
     }
@@ -247,7 +247,7 @@
       outline: none;
     }
 
-    #hexColorInput, #textColorHexInput {
+    #hexLKColorInput, #textColorHexInput {
       text-transform: uppercase;
     }
 
@@ -286,7 +286,7 @@
           <select class="form-select" id="textColorSelect">
             <option value="#FFFFFF" selected>White (#FFFFFF)</option>
             <option value="#000000">Black (#000000)</option>
-            <option value="#FF0000">Red (# Principals apply.
+            <option value="#FF0000">Red (#FF0000)</option>
             <option value="#0000FF">Blue (#0000FF)</option>
             <option value="#00FF00">Green (#00FF00)</option>
             <option value="#FFFF00">Yellow (#FFFF00)</option>
@@ -344,6 +344,21 @@
       </div>
 
       <div class="mb-4">
+        <label for="textMarginLeft" class="form-label">Text Left Margin (px)</label>
+        <input type="number" class="form-control" id="textMarginLeft" value="30" min="0" max="100" />
+      </div>
+
+      <div class="mb-4">
+        <label for="textMarginRight" class="form-label">Text Right Margin (px)</label>
+        <input type="number" class="form-control" id="textMarginRight" value="30" min="0" max="100" />
+      </div>
+
+      <div class="mb-4">
+        <label for="authorMarginRight" class="form-label">Author Right Margin (px)</label>
+        <input type="number" class="form-control" id="authorMarginRight" value="30" min="0" max="100" />
+      </div>
+
+      <div class="mb-4">
         <label class="form-label">Frame Size</label>
         <div class="d-flex align-items-center">
           <i class="fa-solid fa-mobile-screen-button size-icon active" onclick="setFrameSize('reel', this)"></i>
@@ -398,6 +413,9 @@
       const backgroundColor = colorPicker.color.hexString;
       const textColorSelect = document.getElementById("textColorSelect").value;
       const textColorHexInput = document.getElementById("textColorHexInput").value.trim();
+      const textMarginLeft = parseInt(document.getElementById("textMarginLeft").value) || 30;
+      const textMarginRight = parseInt(document.getElementById("textMarginRight").value) || 30;
+      const authorMarginRight = parseInt(document.getElementById("authorMarginRight").value) || 30;
 
       const previewContainer = document.getElementById("preview");
       const previewText = document.getElementById("previewText");
@@ -422,15 +440,20 @@
       }
 
       previewText.innerHTML = parseTextForColors(text, defaultTextColor);
-      previewText.style.fontSize = fontSize + "px";
-      previewText.style.fontWeight = isBold ? "bold" : "normal";
+      previewText.style.fontSize = `${fontSize}px`;
+      previewText.style.fontWeight = isBold ? "700" : "500";
       previewText.style.fontStyle = isItalic ? "italic" : "normal";
       previewText.style.fontFamily = fontFamily;
+      previewText.style.marginLeft = `${textMarginLeft}px`;
+      previewText.style.marginRight = `${textMarginRight}px`;
 
       previewAuthor.innerText = author ? `~ ${author}` : "";
-      previewAuthor.style.fontSize = (fontSize - 4) + "px";
+      previewAuthor.style.fontSize = `${fontSize - 4}px`;
       previewAuthor.style.fontFamily = fontFamily;
       previewAuthor.style.color = defaultTextColor;
+      previewAuthor.style.marginRight = `${authorMarginRight}px`;
+      previewAuthor.style.fontWeight = isBold ? "700" : "500";
+      previewAuthor.style.fontStyle = isItalic ? "italic" : "normal";
 
       const authorImg = document.getElementById("authorImgPreview");
       const file = document.getElementById("authorImageUpload").files[0];
@@ -453,10 +476,13 @@
       document.getElementById("authorInput").value = "";
       document.getElementById("authorImageUpload").value = "";
       document.getElementById("backgroundImageUpload").value = "";
-      backgroundImageacute = null;
+      backgroundImageUrl = null;
       document.getElementById("fontSizeSelect").value = "16";
       document.getElementById("boldToggle").checked = false;
       document.getElementById("italicToggle").checked = false;
+      document.getElementById("textMarginLeft").value = "30";
+      document.getElementById("textMarginRight").value = "30";
+      document.getElementById("authorMarginRight").value = "30";
       const reelIcon = document.querySelector(".size-icon.fa-mobile-screen-button");
       setFrameSize("reel", reelIcon);
       document.getElementById("fontFamilySelect").value = "'Noto Sans Devanagari', sans-serif";
@@ -532,23 +558,11 @@
     }
 
     function downloadImage() {
-      html2canvas(document.getElementById("preview")).then((canvas) => {
-        const link = document.createElement("a");
-        link.download = "reel-text.png";
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    }
-
-    document.getElementById("textInput").addEventListener("input", updatePreview);
-    document.getElementById("authorInput").addEventListener("input", updatePreview);
-    document.getElementById("fontSizeSelect").addEventListener("change", updatePreview);
-    document.getElementById("boldToggle").addEventListener("change", updatePreview);
-    document.getElementById("italicToggle").addEventListener("change", updatePreview);
-    document.getElementById("authorImageUpload").addEventListener("change", updatePreview);
-    document.getElementById("fontFamilySelect").addEventListener("change", updatePreview);
-
-    updatePreview();
-  </script>
-</body>
-</html>
+      const preview = document.getElementById("preview");
+      html2canvas(preview, {
+        backgroundColor: null, // Transparent background to avoid white padding
+        useCORS: true, // Allow cross-origin images (e.g., logo)
+        scale: 2, // Higher resolution for better quality
+        x: 0, // Start at the top-left corner
+        y: 0,
+        width: preview.offsetWidth, // Exact width o
