@@ -120,13 +120,13 @@
       margin: 0 auto;
       position: relative;
       overflow: hidden;
-      border: none; /* Ensure no border */
+      border-radius: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       padding: 30px 14px 20px;
-      box-shadow: none; /* Remove shadow for download */
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
       background-size: cover;
       background-position: center;
     }
@@ -247,7 +247,7 @@
       outline: none;
     }
 
-    #hexLKColorInput, #textColorHexInput {
+    #hexColorInput, #textColorHexInput {
       text-transform: uppercase;
     }
 
@@ -558,11 +558,14 @@
     }
 
     function downloadImage() {
-      const preview = document.getElementById("preview");
-      html2canvas(preview, {
-        backgroundColor: null, // Transparent background to avoid white padding
-        useCORS: true, // Allow cross-origin images (e.g., logo)
-        scale: 2, // Higher resolution for better quality
-        x: 0, // Start at the top-left corner
-        y: 0,
-        width: preview.offsetWidth, // Exact width o
+      html2canvas(document.getElementById("preview")).then((canvas) => {
+        const link = document.createElement("a");
+        link.download = "reel-text.png";
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+
+    // Add event listeners for all inputs
+    document.getElementById("textInput").addEventListener("input", updatePreview);
+    document.getElementById("authorInput").addEventListener("in
