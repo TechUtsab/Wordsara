@@ -151,16 +151,21 @@
     .preview-text {
       text-align: center;
       white-space: pre-wrap;
-      width: 100%;
-      margin: 0.625rem 1.875rem 0 1.875rem; /* 10px = 0.625rem, 30px = 1.875rem */
+      width: 70%; /* 70% width with 15% margins on each side */
+      margin-left: 15%;
+      margin-right: 15%;
       font-weight: 500;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .preview-author {
       font-size: calc(1em - 4px);
       opacity: 0.8;
-      margin: 0.625rem 1.875rem 0 auto; /* 10px = 0.625rem, 30px = 1.875rem */
       text-align: right;
+      width: 70%; /* Match text width */
+      margin-left: auto; /* Align to the right */
     }
 
     .preview-logo {
@@ -362,7 +367,7 @@
       <div class="author-img-wrapper">
         <img id="authorImgPreview" class="preview-author-img" alt="Author"/>
       </div>
-      <div id="previewText" class="preview-text"></div>
+      <div id-printed: 70%previewText" class="preview-text"></div>
       <div id="previewAuthor" class="preview-author"></div>
       <img src="wordsara_logoo.png" alt="Logo" class="preview-logo"/>
     </div>
@@ -380,6 +385,7 @@
     });
 
     let backgroundImageUrl = null;
+    let currentFrameWidth = 360; // Default frame width (reel and square)
 
     function parseTextForColors(text, defaultColor) {
       const regex = /\[color=(#[0-9A-Fa-f]{6})\](.*?)\[\/color\]/g;
@@ -427,10 +433,15 @@
       previewText.style.fontStyle = isItalic ? "italic" : "normal";
       previewText.style.fontFamily = fontFamily;
 
+      // Dynamic vertical margin for text
+      const verticalMargin = 10; // Fixed 10px top margin
+      previewText.style.marginTop = `${verticalMargin}px`;
+
       previewAuthor.innerText = author ? `~ ${author}` : "";
       previewAuthor.style.fontSize = (fontSize - 4) + "px";
       previewAuthor.style.fontFamily = fontFamily;
       previewAuthor.style.color = defaultTextColor;
+      previewAuthor.style.marginTop = `${verticalMargin}px`;
 
       const authorImg = document.getElementById("authorImgPreview");
       const file = document.getElementById("authorImageUpload").files[0];
@@ -446,12 +457,6 @@
         authorImg.src = "";
         authorImg.style.display = "none";
       }
-
-      // Optional: Dynamic margins based on font size (uncomment to use)
-      /*
-      previewText.style.margin = `0.625rem ${fontSize * 1.875 / 16}rem 0 ${fontSize * 1.875 / 16}rem`;
-      previewAuthor.style.margin = `0.625rem ${fontSize * 1.875 / 16}rem 0 auto`;
-      */
     }
 
     function clearAllData() {
@@ -528,13 +533,17 @@
       if (size === "reel") {
         container.style.aspectRatio = "9 / 16";
         container.style.maxWidth = "360px";
+        currentFrameWidth = 360;
       } else if (size === "square") {
         container.style.aspectRatio = "1 / 1";
         container.style.maxWidth = "360px";
+        currentFrameWidth = 360;
       } else if (size === "landscape") {
         container.style.aspectRatio = "16 / 9";
         container.style.maxWidth = "640px";
+        currentFrameWidth = 640;
       }
+      updatePreview(); // Update margins when frame size changes
     }
 
     function downloadImage() {
@@ -557,4 +566,4 @@
     updatePreview();
   </script>
 </body>
-  </html>
+</html>
