@@ -137,6 +137,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      z-index: 1;
     }
 
     .preview-author-img {
@@ -158,6 +159,11 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      min-height: 20px; /* Ensure visibility even with short text */
+      overflow-wrap: break-word; /* Prevent text overflow */
+      position: relative;
+      z-index: 1; /* Ensure text is above background */
+      box-sizing: border-box;
     }
 
     .preview-author {
@@ -166,6 +172,9 @@
       text-align: right;
       width: 70%; /* Match text width */
       margin-left: auto; /* Align to the right */
+      position: relative;
+      z-index: 1; /* Ensure author is above background */
+      box-sizing: border-box;
     }
 
     .preview-logo {
@@ -174,6 +183,7 @@
       height: 80px;
       opacity: 0.9;
       filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
+      z-index: 1;
     }
 
     .size-icon {
@@ -367,7 +377,7 @@
       <div class="author-img-wrapper">
         <img id="authorImgPreview" class="preview-author-img" alt="Author"/>
       </div>
-      <div id-printed: 70%previewText" class="preview-text"></div>
+      <div id="previewText" class="preview-text"></div>
       <div id="previewAuthor" class="preview-author"></div>
       <img src="wordsara_logoo.png" alt="Logo" class="preview-logo"/>
     </div>
@@ -395,8 +405,8 @@
     }
 
     function updatePreview() {
-      const text = document.getElementById("textInput").value;
-      const author = document.getElementById("authorInput").value;
+      const textInput = document.getElementById("textInput").value || "Default Text"; // Fallback text
+      const author = document.getElementById("authorInput").value || "";
       const fontSize = parseInt(document.getElementById("fontSizeSelect").value);
       const isBold = document.getElementById("boldToggle").checked;
       const isItalic = document.getElementById("italicToggle").checked;
@@ -409,6 +419,10 @@
       const previewText = document.getElementById("previewText");
       const previewAuthor = document.getElementById("previewAuthor");
       const hexColorInput = document.getElementById("hexColorInput");
+
+      // Debug: Log content to ensure it's being set
+      console.log("Text:", textInput);
+      console.log("Author:", author);
 
       if (backgroundImageUrl) {
         previewContainer.style.background = `url(${backgroundImageUrl})`;
@@ -427,11 +441,12 @@
         defaultTextColor = textColorHexInput.startsWith("#") ? textColorHexInput : "#" + textColorHexInput;
       }
 
-      previewText.innerHTML = parseTextForColors(text, defaultTextColor);
+      previewText.innerHTML = parseTextForColors(textInput, defaultTextColor);
       previewText.style.fontSize = fontSize + "px";
       previewText.style.fontWeight = isBold ? "bold" : "normal";
       previewText.style.fontStyle = isItalic ? "italic" : "normal";
       previewText.style.fontFamily = fontFamily;
+      previewText.style.color = defaultTextColor; // Ensure text is visible
 
       // Dynamic vertical margin for text
       const verticalMargin = 10; // Fixed 10px top margin
