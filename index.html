@@ -22,7 +22,7 @@
     .btn-custom{background:linear-gradient(to right,#10a37f,#0d8466);border:none;color:#fff;padding:.75rem 1.5rem;border-radius:8px;font-weight:600;transition:transform .2s,box-shadow .2s}
     .btn-custom:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(16,163,127,.4)}
     .btn-custom:active{transform:translateY(0)}
-    .preview-container{max-width:360px;aspect-ratio:9/16;background:#000;margin:0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px 14px 20px;box-shadow:0 8px 20px rgba(0,0,0,.5);background-size:cover;background-position:center}
+    .preview-container{width:360px;background:#000;margin:0 auto;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px 14px 20px;box-shadow:0 8px 20px rgba(0,0,0,.5);background-size:cover;background-position:center}
     .author-img-wrapper{height:80px;margin-bottom:10px;display:flex;justify-content:center;align-items:center;z-index:1}
     .preview-author-img{width:60px;height:60px;border-radius:50%;object-fit:cover;display:none}
     .preview-text{text-align:center;white-space:pre-wrap;width:70%;margin:0 15%;font-weight:500;display:flex;justify-content:center;align-items:center;min-height:20px;overflow-wrap:break-word;position:relative;z-index:1}
@@ -49,14 +49,14 @@
     .modal-header,.modal-footer{border-color:#3a3a3a}
     .modal-title{color:#e0e0e0}
     .btn-close{filter:invert(1) grayscale(100%) brightness(200%)}
-    @media (max-width:768px){.dropdown-menu{max-height:50vh;overflow-y:auto}}
+    @media (max-width:768px){.dropdown-menu{max-height:50vh;overflow-y:auto}.preview-container{width:100%;max-width:360px}}
   </style>
 </head>
 <body>
   <div class="app-bar">
     <span><i class="fa-solid fa-pen-nib me-2"></i>Wordsara Creator</span>
     <div class="dropdown">
-      <i class="fa fa-cog" id="settingsIcon" data-bs-toggle="dropdown" aria-expanded="false"></i>
+      <i class="fa fa-cog" id="settingsIcon" data-bs-toggle="dropdown"></i>
       <div class="dropdown-menu" aria-labelledby="settingsIcon">
         <div class="dropdown-form-group">
           <label for="fontFamilySelect" class="form-label">Font Family</label>
@@ -71,7 +71,7 @@
           <label for="backgroundColorPicker" class="form-label">Background Color</label>
           <div id="backgroundColorPicker"></div>
           <input type="text" id="hexColorInput" class="form-control mt-2" placeholder="#000000" maxlength="7">
-          <label for="backgroundImageUpload" class="form-label mt-2">Background Image Upload</label>
+          <label for="backgroundImageUpload" class="form-label mt-2">Background Image</label>
           <input type="file" id="backgroundImageUpload" class="form-control" accept="image/*">
         </div>
         <div class="dropdown-form-group">
@@ -156,12 +156,12 @@
       <img src="wordsara_logoo.png" alt="Logo" class="preview-logo">
     </div>
   </div>
-  <div class="modal fade" id="scaleModal" tabindex="-1" aria-labelledby="scaleModalLabel" aria-hidden="true">
+  <div class="modal fade" id="scaleModal" tabindex="-1" aria-labelledby="scaleModalLabel">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="scaleModalLabel">Choose Scale</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <label for="scaleSelectModal" class="form-label">Select Scale</label>
@@ -184,18 +184,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
   <script>
     const colorPicker=new iro.ColorPicker("#backgroundColorPicker",{width:180,color:"#000000"}),
-          els={textInput:document.getElementById("textInput"),authorInput:document.getElementById("authorInput"),fontSizeSelect:document.getElementById("fontSizeSelect"),boldToggle:document.getElementById("boldToggle"),italicToggle:document.getElementById("italicToggle"),fontFamilySelect:document.getElementById("fontFamilySelect"),textColorSelect:document.getElementById("textColorSelect"),textColorHexInput:document.getElementById("textColorHexInput"),hexColorInput:document.getElementById("hexColorInput"),backgroundImageUpload:document.getElementById("backgroundImageUpload"),authorImageUpload:document.getElementById("authorImageUpload"),preview:document.getElementById("preview"),previewText:document.getElementById("previewText"),previewAuthor:document.getElementById("previewAuthor"),authorImgPreview:document.getElementById("authorImgPreview"),loadingOverlay:document.getElementById("loadingOverlay"),warningMessage:document.getElementById("warningMessage")};
-    let bgImage=null,frameWidth=360;
-    const updatePreview=()=>{const{textInput,authorInput,fontSizeSelect,boldToggle,italicToggle,fontFamilySelect,textColorSelect,textColorHexInput,preview,previewText,previewAuthor,authorImgPreview,authorImageUpload}=els,{value:text="Default Text"}=textInput,{value:author=""}=authorInput,fs=+fontSizeSelect.value,bold=boldToggle.checked,italic=italicToggle.checked,ff=fontFamilySelect.value,bg=bgImage?`url(${bgImage})`:colorPicker.color.hexString,tc=/^#?[0-9A-Fa-f]{6}$/.test(textColorHexInput.value)?textColorHexInput.value.match(/^#/)?.[0]?textColorHexInput.value:`#${textColorHexInput.value}`:textColorSelect.value;preview.style.cssText=`background:${bg};background-size:${bgImage?"cover":""};background-position:${bgImage?"center":""}`;els.hexColorInput.value=colorPicker.color.hexString.toUpperCase();previewText.innerHTML=text.replace(/\[color=(#[0-9A-Fa-f]{6})\](.*?)\[\/color\]/g,'<span style="color:$1">$2</span>').replace(/^/,'<span style="color:'+tc+'">').replace(/$/,'</span>');Object.assign(previewText.style,{fontSize:fs+"px",fontWeight:bold?"bold":"normal",fontStyle:italic?"italic":"normal",fontFamily:ff,color:tc,marginTop:"10px"});previewAuthor.textContent=author?`~ ${author}`:"";Object.assign(previewAuthor.style,{fontSize:(fs-4)+"px",fontFamily:ff,color:tc,marginTop:"10px"});if(authorImageUpload.files[0]){const r=new FileReader();r.onloadend=()=>{authorImgPreview.src=r.result;authorImgPreview.style.display="block"};r.readAsDataURL(authorImageUpload.files[0])}else{authorImgPreview.src="";authorImgPreview.style.display="none"}};
+          els={textInput:document.getElementById("textInput"),authorInput:document.getElementById("authorInput"),fontSizeSelect:document.getElementById("fontSizeSelect"),boldToggle:document.getElementById("boldToggle"),italicToggle:document.getElementById("italicToggle"),fontFamilySelect:document.getElementById("fontFamilySelect"),textColorSelect:document.getElementById("textColorSelect"),textColorHexInput:document.getElementById("textColorHexInput"),hexColorInput:document.getElementById("hexColorInput"),backgroundImageUpload: matric.getElementById("backgroundImageUpload"),authorImageUpload:document.getElementById("authorImageUpload"),preview:document.getElementById("preview"),previewText:document.getElementById("previewText"),previewAuthor:document.getElementById("previewAuthor"),authorImgPreview:document.getElementById("authorImgPreview"),loadingOverlay:document.getElementById("loadingOverlay"),warningMessage:document.getElementById("warningMessage")};
+    let bgImage=null,frameWidth=360,frameHeight=640;
+    const updatePreview=()=>{const{textInput,authorInput,fontSizeSelect,boldToggle,italicToggle,fontFamilySelect,textColorSelect,textColorHexInput,preview,previewText,previewAuthor,authorImgPreview,authorImageUpload}=els,{value:text="Default Text"}=textInput,{value:author=""}=authorInput,fs=+fontSizeSelect.value,bold=boldToggle.checked,italic=italicToggle.checked,ff=fontFamilySelect.value,bg=bgImage?`url(${bgImage})`:colorPicker.color.hexString,tc=/^#?[0-9A-Fa-f]{6}$/.test(textColorHexInput.value)?textColorHexInput.value.match(/^#/)?.[0]?textColorHexInput.value:`#${textColorHexInput.value}`:textColorSelect.value;preview.style.cssText=`background:${bg};background-size:${bgImage?"cover":""};background-position:${bgImage?"center":""};width:${frameWidth}px;height:${frameHeight}px`;els.hexColorInput.value=colorPicker.color.hexString.toUpperCase();previewText.innerHTML=text.replace(/\[color=(#[0-9A-Fa-f]{6})\](.*?)\[\/color\]/g,'<span style="color:$1">$2</span>').replace(/^/,'<span style="color:'+tc+'">').replace(/$/,'</span>');Object.assign(previewText.style,{fontSize:fs+"px",fontWeight:bold?"bold":"normal",fontStyle:italic?"italic":"normal",fontFamily:ff,color:tc,marginTop:"10px"});previewAuthor.textContent=author?`~ ${author}`:"";Object.assign(previewAuthor.style,{fontSize:(fs-4)+"px",fontFamily:ff,color:tc,marginTop:"10px"});if(authorImageUpload.files[0]){const r=new FileReader();r.onload=()=>{authorImgPreview.src=r.result;authorImgPreview.style.display="block"};r.readAsDataURL(authorImageUpload.files[0])}else{authorImgPreview.src="";authorImgPreview.style.display="none"};preview.offsetHeight};
     const clearAll=()=>{Object.assign(els,{textInput:{value:""},authorInput:{value:""},authorImageUpload:{value:""},backgroundImageUpload:{value:""},fontSizeSelect:{value:"16"},boldToggle:{checked:false},italicToggle:{checked:false},fontFamilySelect:{value:"'Noto Sans Devanagari', sans-serif"},textColorSelect:{value:"#FFFFFF"},textColorHexInput:{value:"#FFFFFF"}});bgImage=null;colorPicker.color.hexString="#000000";els.hexColorInput.value="#000000";setFrameSize("reel",document.querySelector(".size-icon.fa-mobile-screen-button"));updatePreview()};
     colorPicker.on("color:change",c=>!bgImage&&(els.preview.style.background=c.hexString,els.hexColorInput.value=c.hexString.toUpperCase()));
     els.hexColorInput.addEventListener("input",({target:{value:h}})=>/^#?[0-9A-Fa-f]{6}$/.test(h)&&(h=h.match(/^#/)?.[0]?h:`#${h}`,colorPicker.color.hexString=h,!bgImage&&(els.preview.style.background=h)));
-    els.backgroundImageUpload.addEventListener("change",({target:{files}})=>{if(files[0]){const r=new FileReader();r.onloadend=()=>{bgImage=r.result;els.preview.style.cssText=`background:url(${bgImage});background-size:cover;background-position:center`;updatePreview()};r.readAsDataURL(files[0])}else{bgImage=null;updatePreview()}});
+    els.backgroundImageUpload.addEventListener("change",({target:{files}})=>{if(files[0]){const r=new FileReader();r.onload=()=>{bgImage=r.result;els.preview.style.cssText=`background:url(${bgImage});background-size:cover;background-position:center;width:${frameWidth}px;height:${frameHeight}px`;updatePreview()};r.readAsDataURL(files[0])}else{bgImage=null;updatePreview()}});
     ["textInput","authorInput","fontSizeSelect","boldToggle","italicToggle","authorImageUpload","fontFamilySelect","textColorSelect"].forEach(id=>els[id].addEventListener(id.includes("Input")?"input":"change",updatePreview));
     els.textColorHexInput.addEventListener("input",({target:{value}})=>/^#?[0-9A-Fa-f]{6}$/.test(value)&&updatePreview());
-    const setFrameSize=(size,icon)=>{document.querySelectorAll(".size-icon").forEach(i=>i.classList.remove("active"));icon.classList.add("active");const s=size==="reel"?{ar:"9/16",mw:"360px",fw:360}:size==="square"?{ar:"1/1",mw:"360px",fw:360}:{ar:"16/9",mw:"640px",fw:640};Object.assign(els.preview.style,{aspectRatio:s.ar,maxWidth:s.mw});frameWidth=s.fw;updatePreview()};
-    const download=()=>{const{preview,loadingOverlay,warningMessage}=els,scale=+document.getElementById("scaleSelectModal").value,modal=bootstrap.Modal.getInstance(document.getElementById("scaleModal"));loadingOverlay.style.display="flex";modal.hide();if(scale>2){warningMessage.style.display="block";setTimeout(()=>(warningMessage.style.display="none"),3e3)}loadingOverlay.style.display="none";html2canvas(preview,{scale,useCORS:true,backgroundColor:null}).then(c=>{const t=document.createElement("canvas"),w=preview.offsetWidth*scale,h=preview.offsetHeight*scale;t.width=w;t.height=h;t.getContext("2d").drawImage(c,0,0,w,h);const l=document.createElement("a");l.download=`reel-text-${scale}x.png`;l.href=t.toDataURL("image/png",1);l.click();loadingOverlay.style.display="none"}).catch(e=>{console.error(`Error at ${scale}x:`,e);alert("Download failed.");loadingOverlay.style.display="none"})};
+    const setFrameSize=(size,icon)=>{document.querySelectorAll(".size-icon").forEach(i=>i.classList.remove("active"));icon.classList.add("active");const s=size==="reel"?{ar:"9/16",w:360,h:640}:size==="square"?{ar:"1/1",w:360,h:360}:{ar:"16/9",w:640,h:360};frameWidth=s.w;frameHeight=s.h;Object.assign(els.preview.style,{aspectRatio:s.ar,width:`${s.w}px`,height:`${s.h}px`,maxWidth:`${s.w}px`});updatePreview()};
+    const download=()=>{const{preview,loadingOverlay,warningMessage}=els,scale=+document.getElementById("scaleSelectModal").value,modal=bootstrap.Modal.getInstance(document.getElementById("scaleModal"));loadingOverlay.style.display="flex";modal.hide();if(scale>2){warningMessage.style.display="block";setTimeout(()=>(warningMessage.style.display="none"),3e3)}loadingOverlay.style.display="none";html2canvas(preview,{scale,useCORS:true,backgroundColor:null}).then(c=>{const t=document.createElement("canvas"),w=frameWidth*scale,h=frameHeight*scale;t.width=w;t.height=h;t.getContext("2d").drawImage(c,0,0,w,h);const l=document.createElement("a");l.download=`reel-text-${scale}x.png`;l.href=t.toDataURL("image/png");l.click();loadingOverlay.style.display="none"}).catch(e=>{console.error(`Error at ${scale}x:`,e);alert("Download failed.");loadingOverlay.style.display="none"})};
     updatePreview();
   </script>
 </body>
-  </html>
+</html>
