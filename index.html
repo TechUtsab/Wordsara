@@ -186,84 +186,47 @@
       z-index: 1;
     }
 
-    .size-icon {
-      font-size: 1.5rem;
-      cursor: pointer;
-      margin-right: 10px;
-      color: #ccc;
-      transition: color 0.3s, transform 0.3s;
-    }
-
-    .size-icon:hover {
-      color: #10a37f;
-      transform: scale(1.2);
-    }
-
-    .size-icon.active {
-      color: #10a37f;
-      transform: scale(1.2);
-    }
-
-    .form-check-input {
-      background-color: #2a2a2a;
-      border: 1px solid #3a3a3a;
-    }
-
-    .form-check-input:checked {
-      background-color: #10a37f;
-      border-color: #10a37f;
-    }
-
-    .form-check-label {
+    /* Text Alignment Styles */
+    .btn-outline-secondary {
+      border-color: #3a3a3a;
       color: #e0e0e0;
+      transition: all 0.3s ease;
     }
 
-    .dropdown-menu {
-      background-color: #2a2a2a;
-      border: 1px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 0.5rem;
-      min-width: 220px;
-    }
-
-    .dropdown-item {
-      color: #e0e0e0;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      transition: background-color 0.2s;
-    }
-
-    .dropdown-item:hover {
+    .btn-outline-secondary:hover {
       background-color: #3a3a3a;
       color: #ffffff;
     }
 
-    .dropdown-form-group {
-      padding: 0.5rem 1rem;
+    .btn-outline-secondary.active {
+      background-color: #10a37f !important;
+      border-color: #10a37f !important;
+      color: white !important;
     }
 
-    #backgroundColorPicker {
-      margin: 0.5rem auto;
-      display: block;
+    .alignment-buttons .btn {
+      flex: 1;
     }
 
-    #hexColorInput, #backgroundImageUpload, #textColorHexInput {
-      background-color: #2a2a2a;
-      color: #e0e0e0;
-      border: 1px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 0.5rem;
-      width: 100%;
+    /* Frame Size Button Styles */
+    .size-btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px !important;
+      padding: 0;
     }
 
-    #hexColorInput:focus, #backgroundImageUpload:focus, #textColorHexInput:focus {
-      border-color: #10a37f;
-      box-shadow: 0 0 5px rgba(16, 163, 127, 0.5);
-      outline: none;
+    .size-btn i {
+      font-size: 1.2rem;
     }
 
-    #hexColorInput, #textColorHexInput {
-      text-transform: uppercase;
+    .size-btn.active {
+      background-color: #10a37f !important;
+      border-color: #10a37f !important;
+      color: white !important;
     }
 
     .loading-overlay {
@@ -317,13 +280,6 @@
     .btn-close {
       filter: invert(1) grayscale(100%) brightness(200%);
     }
-
-    @media (max-width: 768px) {
-      .dropdown-menu {
-        max-height: 50vh;
-        overflow-y: auto;
-      }
-    }
   </style>
 </head>
 <body>
@@ -369,8 +325,23 @@
   <div class="main-container">
     <div class="form-section">
       <div class="mb-4">
-     <label for="textInput" class="form-label">अपना टेक्स्ट यहाँ लिखें (Highlight: [color=#FF0000]word[/color])</label>
+        <label for="textInput" class="form-label">अपना टेक्स्ट यहाँ लिखें (Highlight: [color=#FF0000]word[/color])</label>
         <textarea class="form-control" id="textInput" rows="4">लोग कहते है [color=#FF0000]कुछ[/color] अपने दिल की सुनाओ यहाँ दिल की खुद ही को समझ नहीं आ रही औरो को क्या सुनाए !!</textarea>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">टेक्स्ट अलाइनमेंट</label>
+        <div class="btn-group w-100 alignment-buttons">
+          <button class="btn btn-outline-secondary active" onclick="setTextAlignment('left')">
+            <i class="fa-solid fa-align-left"></i>
+          </button>
+          <button class="btn btn-outline-secondary" onclick="setTextAlignment('center')">
+            <i class="fa-solid fa-align-center"></i>
+          </button>
+          <button class="btn btn-outline-secondary" onclick="setTextAlignment('right')">
+            <i class="fa-solid fa-align-right"></i>
+          </button>
+        </div>
       </div>
 
       <div class="mb-4">
@@ -412,10 +383,16 @@
 
       <div class="mb-4">
         <label class="form-label">Frame Size</label>
-        <div class="d-flex align-items-center">
-          <i class="fa-solid fa-mobile-screen-button size-icon active" onclick="setFrameSize('reel', this)"></i>
-          <i class="fa-regular fa-square size-icon" onclick="setFrameSize('square', this)"></i>
-          <i class="fa-solid fa-tv size-icon" onclick="setFrameSize('landscape', this)"></i>
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-outline-secondary size-btn active" onclick="setFrameSize('reel', this)">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </button>
+          <button class="btn btn-outline-secondary size-btn" onclick="setFrameSize('square', this)">
+            <i class="fa-regular fa-square"></i>
+          </button>
+          <button class="btn btn-outline-secondary size-btn" onclick="setFrameSize('landscape', this)">
+            <i class="fa-solid fa-tv"></i>
+          </button>
         </div>
       </div>
 
@@ -479,6 +456,39 @@
 
     let backgroundImageUrl = null;
     let currentFrameWidth = 360;
+    let currentTextAlignment = 'left';
+
+    function setTextAlignment(alignment) {
+      currentTextAlignment = alignment;
+      document.querySelectorAll('.alignment-buttons .btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.closest('button').classList.add('active');
+      updatePreview();
+    }
+
+    function setFrameSize(size, buttonElement) {
+      const container = document.getElementById("preview");
+      const buttons = document.querySelectorAll(".size-btn");
+      
+      buttons.forEach(btn => btn.classList.remove("active"));
+      buttonElement.classList.add("active");
+
+      if (size === "reel") {
+        container.style.aspectRatio = "9 / 16";
+        container.style.maxWidth = "360px";
+        currentFrameWidth = 360;
+      } else if (size === "square") {
+        container.style.aspectRatio = "1 / 1";
+        container.style.maxWidth = "360px";
+        currentFrameWidth = 360;
+      } else if (size === "landscape") {
+        container.style.aspectRatio = "16 / 9";
+        container.style.maxWidth = "640px";
+        currentFrameWidth = 640;
+      }
+      updatePreview();
+    }
 
     function parseTextForColors(text, defaultColor) {
       const regex = /\[color=(#[0-9A-Fa-f]{6})\](.*?)\[\/color\]/g;
@@ -526,6 +536,7 @@
       previewText.style.fontStyle = isItalic ? "italic" : "normal";
       previewText.style.fontFamily = fontFamily;
       previewText.style.color = defaultTextColor;
+      previewText.style.textAlign = currentTextAlignment;
 
       const verticalMargin = 10;
       previewText.style.marginTop = `${verticalMargin}px`;
@@ -561,13 +572,14 @@
       document.getElementById("fontSizeSelect").value = "16";
       document.getElementById("boldToggle").checked = false;
       document.getElementById("italicToggle").checked = false;
-      const reelIcon = document.querySelector(".size-icon.fa-mobile-screen-button");
-      setFrameSize("reel", reelIcon);
+      const reelBtn = document.querySelector(".size-btn .fa-mobile-screen-button").closest(".size-btn");
+      setFrameSize("reel", reelBtn);
       document.getElementById("fontFamilySelect").value = "'Noto Sans Devanagari', sans-serif";
       colorPicker.color.hexString = "#000000";
       document.getElementById("hexColorInput").value = "#000000";
       document.getElementById("textColorSelect").value = "#FFFFFF";
       document.getElementById("textColorHexInput").value = "#FFFFFF";
+      setTextAlignment('left');
       updatePreview();
     }
 
@@ -617,35 +629,12 @@
       }
     });
 
-    function setFrameSize(size, iconElement) {
-      const container = document.getElementById("preview");
-      const icons = document.querySelectorAll(".size-icon");
-      icons.forEach((icon) => icon.classList.remove("active"));
-      iconElement.classList.add("active");
-
-      if (size === "reel") {
-        container.style.aspectRatio = "9 / 16";
-        container.style.maxWidth = "360px";
-        currentFrameWidth = 360;
-      } else if (size === "square") {
-        container.style.aspectRatio = "1 / 1";
-        container.style.maxWidth = "360px";
-        currentFrameWidth = 360;
-      } else if (size === "landscape") {
-        container.style.aspectRatio = "16 / 9";
-        container.style.maxWidth = "640px";
-        currentFrameWidth = 640;
-      }
-      updatePreview();
-    }
-
     function downloadWithScale() {
       const previewContainer = document.getElementById("preview");
       const loadingOverlay = document.getElementById("loadingOverlay");
       const scaleSelect = document.getElementById("scaleSelectModal");
       const scaleModal = bootstrap.Modal.getInstance(document.getElementById("scaleModal"));
 
-      // Show loading spinner and hide modal
       loadingOverlay.style.display = "flex";
       scaleModal.hide();
 
@@ -653,14 +642,12 @@
       const canvasWidth = previewContainer.offsetWidth * scale;
       const canvasHeight = previewContainer.offsetHeight * scale;
 
-      // Show warning for high scaling
       const warningMessage = document.getElementById("warningMessage");
       if (scale > 2) {
         warningMessage.style.display = "block";
         setTimeout(() => (warningMessage.style.display = "none"), 3000);
       }
 
-      // Hide loading overlay before capturing to exclude it from the image
       loadingOverlay.style.display = "none";
 
       html2canvas(previewContainer, {
@@ -680,19 +667,12 @@
         link.href = tempCanvas.toDataURL("image/png", 1.0);
         link.click();
 
-        // Hide loading spinner after download
         loadingOverlay.style.display = "none";
       }).catch((error) => {
         console.error(`Error generating ${scale}x PNG image:`, error);
         alert("Failed to download image. Please try again.");
         loadingOverlay.style.display = "none";
       });
-    }
-
-    function downloadImage() {
-      // Trigger the modal to open
-      const scaleModal = new bootstrap.Modal(document.getElementById("scaleModal"));
-      scaleModal.show();
     }
 
     document.getElementById("textInput").addEventListener("input", updatePreview);
