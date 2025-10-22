@@ -280,6 +280,24 @@
     .btn-close {
       filter: invert(1) grayscale(100%) brightness(200%);
     }
+
+    /* Copy Icon and Feedback Styles */
+    .copy-icon {
+      cursor: pointer;
+      color: #10a37f;
+      transition: color 0.3s;
+    }
+
+    .copy-icon:hover {
+      color: #0d8466;
+    }
+
+    .copy-feedback {
+      display: none;
+      color: #10a37f;
+      font-size: 0.9rem;
+      margin-left: 10px;
+    }
   </style>
 </head>
 <body>
@@ -325,7 +343,11 @@
   <div class="main-container">
     <div class="form-section">
       <div class="mb-4">
-        <label for="textInput" class="form-label">अपना टेक्स्ट यहाँ लिखें (Highlight: [color=#FF0000]word[/color])</label>
+        <label for="textInput" class="form-label">
+          अपना टेक्स्ट यहाँ लिखें
+          <i class="fa-solid fa-copy ms-2 copy-icon" title="Copy [color=#FF0000]word[/color] syntax" onclick="copyColorSyntax()"></i>
+          <span id="copyFeedback" class="copy-feedback">Copied!</span>
+        </label>
         <textarea class="form-control" id="textInput" rows="4">लोग कहते है [color=#FF0000]कुछ[/color] अपने दिल की सुनाओ यहाँ दिल की खुद ही को समझ नहीं आ रही औरो को क्या सुनाए !!</textarea>
       </div>
 
@@ -628,6 +650,20 @@
         updatePreview();
       }
     });
+
+    function copyColorSyntax() {
+      const textToCopy = '[color=#FF0000]word[/color]';
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const feedback = document.getElementById('copyFeedback');
+        feedback.style.display = 'inline';
+        setTimeout(() => {
+          feedback.style.display = 'none';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text:', err);
+        alert('Failed to copy text to clipboard. Please try again.');
+      });
+    }
 
     function downloadWithScale() {
       const previewContainer = document.getElementById("preview");
