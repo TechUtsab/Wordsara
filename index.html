@@ -5,721 +5,536 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Wordsara Creator</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Hind:wght@400;700&family=Mukta:wght@400;700&family=Poppins:wght@400;700&display=swap"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Hind:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Teko:wght@400;600&display=swap"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --primary-color: #10a37f;
+      --bg-dark: #121212;
+      --panel-bg: #1e1e1e;
+      --border-color: #333;
     }
 
     body {
-      background: linear-gradient(135deg, #1a1a1a, #121212);
-      color: #ffffff;
-      font-family: 'Noto Sans Devanagari', sans-serif;
+      background-color: var(--bg-dark);
+      font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
       padding-top: 70px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      color: #fff;
     }
 
+    /* --- Navbar --- */
     .app-bar {
-      background: linear-gradient(to right, #10a37f, #0d8466);
+      background: rgba(30, 30, 30, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
       padding: 0.75rem 1.5rem;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+
+    .brand-title {
       font-size: 1.25rem;
       font-weight: 700;
-      color: white;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      color: var(--primary-color);
     }
 
-    .app-bar i {
-      cursor: pointer;
-      transition: transform 0.3s;
-    }
-
-    .app-bar i:hover {
-      transform: rotate(90deg);
-    }
-
+    /* --- Layout --- */
     .main-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
     }
 
-    @media (max-width: 768px) {
-      .main-container {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .form-section {
-      background: #1e1e1e;
-      padding: 2rem;
+    /* Controls Panel */
+    .controls-wrapper {
+      background: var(--panel-bg);
       border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
     }
 
-    .form-control, .form-select {
-      background-color: #2a2a2a;
-      color: white;
-      border: 1px solid #3a3a3a;
-      border-radius: 8px;
-      padding: 0.75rem;
-      transition: border-color 0.3s, box-shadow 0.3s;
+    .accordion-button:not(.collapsed) {
+      background-color: rgba(16, 163, 127, 0.1) !important;
+      color: var(--primary-color) !important;
+      box-shadow: none;
     }
+    
+    .accordion-button:focus { box-shadow: none; }
+    .accordion-item { border-color: var(--border-color); }
+    .accordion-button { color: #fff; background: transparent; }
 
-    .form-control:focus, .form-select:focus {
-      border-color: #10a37f;
-      box-shadow: 0 0 5px rgba(16, 163, 127, 0.5);
-      background-color: #2a2a2a;
+    /* Form Elements */
+    .form-control, .form-select, .input-group-text {
+      background-color: #2b2b2b;
+      border: 1px solid #444;
+      color: #fff;
     }
-
-    .form-label {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: #e0e0e0;
+    .form-control:focus {
+      border-color: var(--primary-color);
+      box-shadow: none;
     }
 
     .btn-custom {
-      background: linear-gradient(to right, #10a37f, #0d8466);
-      border: none;
+      background: var(--primary-color);
       color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
+      border: none;
       font-weight: 600;
-      transition: transform 0.2s, box-shadow 0.2s;
     }
+    .btn-custom:hover { background: #0d8466; color: white; }
 
-    .btn-custom:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(16, 163, 127, 0.4);
-    }
-
-    .btn-custom:active {
-      transform: translateY(0);
+    /* --- Preview Area --- */
+    .preview-sticky-wrapper {
+      position: sticky;
+      top: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .preview-container {
+      width: 100%;
       max-width: 360px;
       aspect-ratio: 9 / 16;
       background: #000000;
-      margin: 0 auto;
       position: relative;
       overflow: hidden;
-      border-radius: 0;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+      border: 1px solid #333;
+      display: flex;
+      flex-direction: column; 
+    }
+
+    .bg-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #000;
+      opacity: 0; 
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      padding: 40px 25px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 30px 14px 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      background-size: cover;
-      background-position: center;
     }
 
-    .author-img-wrapper {
+    .author-img-container {
+      width: 80px;
       height: 80px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.3);
+      margin-bottom: 20px;
+      display: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transform: translateZ(0); 
     }
 
     .preview-author-img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      display: none;
+    }
+
+    /* --- NEW WRAPPER FOR TEXT & AUTHOR --- */
+    /* This ensures the author name aligns with the text block, not the full container */
+    .text-block-wrapper {
+      width: fit-content; /* Key fix: shrink to fit text */
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .preview-text {
-      text-align: center;
+      /* width: 100%; Removed to allow fit-content to work */
       white-space: pre-wrap;
-      width: 70%;
-      margin-left: 15%;
-      margin-right: 15%;
-      font-weight: 500;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 20px;
       overflow-wrap: break-word;
-      position: relative;
-      z-index: 1;
-      box-sizing: border-box;
+      line-height: 1.6;
+      text-align: center;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .preview-author {
-      font-size: calc(1em - 4px);
-      opacity: 0.8;
+    .preview-author-name {
+      /* width: 100%; Removed */
+      align-self: flex-end; /* Pushes to the right edge of the wrapper */
+      margin-top: 15px;
+      opacity: 0.9;
+      font-size: 0.85em;
       text-align: right;
-      width: 70%;
-      margin-right: 15%;
-      margin-left: auto;
-      position: relative;
-      z-index: 1;
-      box-sizing: border-box;
+      font-weight: 500;
+      letter-spacing: 0.5px;
     }
 
     .preview-logo {
-      margin-top: 10px;
-      width: 80px;
-      height: 80px;
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
       opacity: 0.9;
-      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.5));
-      z-index: 1;
-    }
-
-    /* Text Alignment Styles */
-    .btn-outline-secondary {
-      border-color: #3a3a3a;
-      color: #e0e0e0;
-      transition: all 0.3s ease;
-    }
-
-    .btn-outline-secondary:hover {
-      background-color: #3a3a3a;
-      color: #ffffff;
-    }
-
-    .btn-outline-secondary.active {
-      background-color: #10a37f !important;
-      border-color: #10a37f !important;
-      color: white !important;
-    }
-
-    .alignment-buttons .btn {
-      flex: 1;
-    }
-
-    /* Frame Size Button Styles */
-    .size-btn {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px !important;
-      padding: 0;
-    }
-
-    .size-btn i {
-      font-size: 1.2rem;
-    }
-
-    .size-btn.active {
-      background-color: #10a37f !important;
-      border-color: #10a37f !important;
-      color: white !important;
+      z-index: 3;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
     }
 
     .loading-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85);
+      z-index: 9999;
       display: none;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      z-index: 1001;
+      color: var(--primary-color);
+      backdrop-filter: blur(5px);
     }
+    
+    .spinner-border { width: 4rem; height: 4rem; border-width: 4px; }
+    .loading-text { margin-top: 15px; font-size: 1.2rem; color: white; font-weight: 500; }
 
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #10a37f;
-      border-top: 4px solid transparent;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .warning-message {
-      color: #ffcc00;
-      font-size: 0.9rem;
-      margin-top: 0.5rem;
-      display: none;
-    }
-
-    .modal-content {
-      background-color: #2a2a2a;
-      border: 1px solid #3a3a3a;
-      border-radius: 8px;
-    }
-
-    .modal-header, .modal-footer {
-      border-color: #3a3a3a;
-    }
-
-    .modal-title {
-      color: #e0e0e0;
-    }
-
-    .btn-close {
-      filter: invert(1) grayscale(100%) brightness(200%);
-    }
-
-    /* Copy Icon and Feedback Styles */
-    .copy-icon {
-      cursor: pointer;
-      color: #10a37f;
-      transition: color 0.3s;
-    }
-
-    .copy-icon:hover {
-      color: #0d8466;
-    }
-
-    .copy-feedback {
-      display: none;
-      color: #10a37f;
-      font-size: 0.9rem;
-      margin-left: 10px;
-    }
+    .btn-tool { border: 1px solid #444; color: #ccc; }
+    .btn-tool.active { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
+    .range-value { font-size: 0.8rem; color: #888; }
+    .iro-center { display: flex; justify-content: center; margin: 10px 0; }
   </style>
 </head>
 <body>
-  <div class="app-bar">
-    <span><i class="fa-solid fa-pen-nib me-2"></i>Wordsara Creator</span>
-    <div class="dropdown">
-      <i class="fa fa-cog" id="settingsIcon" data-bs-toggle="dropdown" aria-expanded="false"></i>
-      <div class="dropdown-menu" aria-labelledby="settingsIcon">
-        <div class="dropdown-form-group">
-          <label for="fontFamilySelect" class="form-label">Font Family</label>
-          <select class="form-select" id="fontFamilySelect">
-            <option value="'Noto Sans Devanagari', sans-serif" selected>Noto Sans Devanagari</option>
-            <option value="'Hind', sans-serif">Hind</option>
-            <option value="'Mukta', sans-serif">Mukta</option>
-            <option value="'Poppins', sans-serif">Poppins</option>
-          </select>
-        </div>
-        <div class="dropdown-form-group">
-          <label for="backgroundColorPicker" class="form-label">Background Color</label>
-          <div id="backgroundColorPicker"></div>
-          <input type="text" id="hexColorInput" class="form-control mt-2" placeholder="#000000" maxlength="7" />
-          <label for="backgroundImageUpload" class="form-label mt-2">Background Image Upload</label>
-          <input type="file" id="backgroundImageUpload" class="form-control" accept="image/*" />
-        </div>
-        <div class="dropdown-form-group">
-          <label for="textColorSelect" class="form-label">Text Color</label>
-          <select class="form-select" id="textColorSelect">
-            <option value="#FFFFFF" selected>White (#FFFFFF)</option>
-            <option value="#000000">Black (#000000)</option>
-            <option value="#FF0000">Red (#FF0000)</option>
-            <option value="#0000FF">Blue (#0000FF)</option>
-            <option value="#00FF00">Green (#00FF00)</option>
-            <option value="#FFFF00">Yellow (#FFFF00)</option>
-            <option value="#800080">Purple (#800080)</option>
-          </select>
-          <label for="textColorHexInput" class="form-label mt-2">Custom Text Color (Hex)</label>
-          <input type="text" id="textColorHexInput" class="form-control mt-2" placeholder="#FFFFFF" maxlength="7" />
-        </div>
-      </div>
-    </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner-border" role="status"></div>
+    <div class="loading-text">Generating Maximum Quality Image...</div>
   </div>
 
-  <div class="main-container">
-    <div class="form-section">
-      <div class="mb-4">
-        <label for="textInput" class="form-label">
-          अपना टेक्स्ट यहाँ लिखें
-          <i class="fa-solid fa-copy ms-2 copy-icon" title="Copy [color=#FF0000]word[/color] syntax" onclick="copyColorSyntax()"></i>
-          <span id="copyFeedback" class="copy-feedback">Copied!</span>
-        </label>
-        <textarea class="form-control" id="textInput" rows="4">लोग कहते है [color=#FF0000]कुछ[/color] अपने दिल की सुनाओ यहाँ दिल की खुद ही को समझ नहीं आ रही औरो को क्या सुनाए !!</textarea>
-      </div>
-
-      <div class="mb-4">
-        <label class="form-label">टेक्स्ट अलाइनमेंट</label>
-        <div class="btn-group w-100 alignment-buttons">
-          <button class="btn btn-outline-secondary active" onclick="setTextAlignment('left')">
-            <i class="fa-solid fa-align-left"></i>
-          </button>
-          <button class="btn btn-outline-secondary" onclick="setTextAlignment('center')">
-            <i class="fa-solid fa-align-center"></i>
-          </button>
-          <button class="btn btn-outline-secondary" onclick="setTextAlignment('right')">
-            <i class="fa-solid fa-align-right"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <label for="authorInput" class="form-label">Author / Source (optional)</label>
-        <input type="text" class="form-control" id="authorInput" />
-      </div>
-
-      <div class="mb-4">
-        <label for="authorImageUpload" class="form-label">Author Photo Upload</label>
-        <input type="file" class="form-control" id="authorImageUpload" accept="image/*" />
-      </div>
-
-      <div class="mb-4">
-        <label for="fontSizeSelect" class="form-label">Font Size (px)</label>
-        <select class="form-select" id="fontSizeSelect">
-          <option value="8">8px</option>
-          <option value="10">10px</option>
-          <option value="12">12px</option>
-          <option value="14">14px</option>
-          <option value="16" selected>16px</option>
-          <option value="18">18px</option>
-          <option value="20">20px</option>
-          <option value="22">22px</option>
-          <option value="25">25px</option>
-          <option value="28">28px</option>
-        </select>
-      </div>
-
-      <div class="mb-4 d-flex gap-3">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="boldToggle" />
-          <label class="form-check-label" for="boldToggle">Bold</label>
-        </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="italicToggle" />
-          <label class="form-check-label" for="italicToggle">Italic</label>
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <label class="form-label">Frame Size</label>
-        <div class="d-flex align-items-center gap-2">
-          <button class="btn btn-outline-secondary size-btn active" onclick="setFrameSize('reel', this)">
-            <i class="fa-solid fa-mobile-screen-button"></i>
-          </button>
-          <button class="btn btn-outline-secondary size-btn" onclick="setFrameSize('square', this)">
-            <i class="fa-regular fa-square"></i>
-          </button>
-          <button class="btn btn-outline-secondary size-btn" onclick="setFrameSize('landscape', this)">
-            <i class="fa-solid fa-tv"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="mb-4 d-flex gap-2">
-        <button class="btn btn-custom w-100" onclick="clearAllData()">Clear All Data</button>
-        <button class="btn btn-custom w-100" data-bs-toggle="modal" data-bs-target="#scaleModal">Download Image</button>
-      </div>
-      <div id="warningMessage" class="warning-message">High scaling (3x/4x) may result in larger file sizes.</div>
+  <nav class="app-bar">
+    <div class="d-flex align-items-center">
+      <i class="fa-solid fa-pen-nib me-2 text-success"></i>
+      <span class="brand-title">Wordsara Creator Pro</span>
     </div>
+    <button class="btn btn-sm btn-outline-light" onclick="location.reload()">Reset</button>
+  </nav>
 
-    <div class="preview-container" id="preview">
-      <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-      </div>
-      <div class="author-img-wrapper">
-        <img id="authorImgPreview" class="preview-author-img" alt="Author"/>
-      </div>
-      <div id="previewText" class="preview-text"></div>
-      <div id="previewAuthor" class="preview-author"></div>
-      <img src="wordsara_logoo.png" alt="Logo" class="preview-logo"/>
-    </div>
-  </div>
+  <div class="container-fluid main-container">
+    <div class="row g-4">
+      
+      <div class="col-lg-7 col-md-6">
+        <div class="controls-wrapper">
+          <div class="accordion" id="toolsAccordion">
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelText">Typography</button></h2>
+              <div id="panelText" class="accordion-collapse collapse show" data-bs-parent="#toolsAccordion">
+                <div class="accordion-body">
+                  <div class="mb-3">
+                     <label class="form-label d-flex justify-content-between">
+                       <span>Message</span>
+                       <button class="btn btn-xs btn-outline-warning py-0" style="font-size:0.7rem" onclick="addHighlight()">Highlight Word [Color]</button>
+                     </label>
+                     <textarea class="form-control" id="textInput" rows="4">लोग कहते है [color=#FF0000]कुछ[/color] अपने दिल की सुनाओ..</textarea>
+                  </div>
+                  
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label>Font</label>
+                      <select class="form-select" id="fontFamilySelect">
+                        <option value="'Noto Sans Devanagari', sans-serif">Hindi (Noto)</option>
+                        <option value="'Mukta', sans-serif">Hindi (Mukta)</option>
+                        <option value="'Poppins', sans-serif">English (Poppins)</option>
+                        <option value="'Teko', sans-serif">Headlines (Teko)</option>
+                      </select>
+                    </div>
+                    <div class="col-6">
+                      <label>Text Color</label>
+                      <input type="color" class="form-control form-control-color w-100" id="textColorPicker" value="#ffffff">
+                    </div>
+                  </div>
 
-  <!-- Bootstrap Modal for Scaling Selection -->
-  <div class="modal fade" id="scaleModal" tabindex="-1" aria-labelledby="scaleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="scaleModalLabel">Choose Download Scale</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="scaleSelectModal" class="form-label">Select Scale</label>
-            <select class="form-select" id="scaleSelectModal">
-              <option value="1">1x (Standard)</option>
-              <option value="2" selected>2x (High Quality)</option>
-              <option value="3">3x (Ultra High Quality)</option>
-              <option value="4">4x (Maximum Quality)</option>
-            </select>
+                  <div class="mt-3">
+                    <label>Size: <span id="val-size">14px</span></label>
+                    <input type="range" class="form-range" id="fontSizeRange" min="8" max="60" value="14">
+                  </div>
+                  
+                  <div class="d-flex gap-2 mt-3">
+                     <input type="checkbox" class="btn-check" id="boldToggle">
+                     <label class="btn btn-outline-secondary btn-sm" for="boldToggle">Bold</label>
+                     
+                     <input type="checkbox" class="btn-check" id="shadowToggle">
+                     <label class="btn btn-outline-secondary btn-sm" for="shadowToggle">Shadow</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelAlign">Layout</button></h2>
+              <div id="panelAlign" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
+                <div class="accordion-body">
+                  <div class="btn-group w-100 mb-3">
+                    <button class="btn btn-tool" onclick="setTextAlign('left', this)"><i class="fa-solid fa-align-left"></i></button>
+                    <button class="btn btn-tool active" onclick="setTextAlign('center', this)"><i class="fa-solid fa-align-center"></i></button>
+                    <button class="btn btn-tool" onclick="setTextAlign('right', this)"><i class="fa-solid fa-align-right"></i></button>
+                  </div>
+                  <div class="btn-group w-100 mb-3">
+                     <button class="btn btn-tool" onclick="setYAlign('flex-start', this)">Top</button>
+                     <button class="btn btn-tool active" onclick="setYAlign('center', this)">Middle</button>
+                     <button class="btn btn-tool" onclick="setYAlign('flex-end', this)">Bottom</button>
+                  </div>
+                  <div class="btn-group w-100">
+                     <button class="btn btn-tool active" onclick="setFrame('reel', this)">Reel (9:16)</button>
+                     <button class="btn btn-tool" onclick="setFrame('square', this)">Square (1:1)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelBg">Background</button></h2>
+              <div id="panelBg" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
+                <div class="accordion-body">
+                   <ul class="nav nav-tabs mb-3" id="bgTab">
+                     <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabColor">Color</button></li>
+                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabImg">Image</button></li>
+                   </ul>
+                   
+                   <div class="tab-content">
+                     <div class="tab-pane fade show active" id="tabColor">
+                       <div id="iroPicker" class="iro-center"></div>
+                     </div>
+                     <div class="tab-pane fade" id="tabImg">
+                       <input type="file" class="form-control mb-3" id="bgImgInput" accept="image/*">
+                       <label>Dark Overlay: <span id="val-overlay">0%</span></label>
+                       <input type="range" class="form-range" id="overlayRange" min="0" max="0.9" step="0.1" value="0">
+                     </div>
+                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelAuthor">Author</button></h2>
+              <div id="panelAuthor" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
+                <div class="accordion-body">
+                   <input type="text" class="form-control mb-2" id="authorName" placeholder="Author Name">
+                   <input type="file" class="form-control" id="authorImgInput" accept="image/*">
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="p-3 bg-dark border-top border-secondary">
+             <button class="btn btn-custom w-100 py-3" onclick="downloadImage()">
+               <i class="fa-solid fa-download me-2"></i> Download Max Quality Image
+             </button>
+             <div class="text-center mt-2 text-muted small">Generates 4x Ultra HD PNG</div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-custom" onclick="downloadWithScale()">Download</button>
+      </div>
+
+      <div class="col-lg-5 col-md-6">
+        <div class="preview-sticky-wrapper">
+          <div class="text-muted mb-2 small"><i class="fa-regular fa-eye"></i> Live Preview</div>
+          
+          <div id="preview" class="preview-container">
+            <div class="bg-overlay" id="previewOverlay"></div>
+            
+            <div class="content-wrapper" id="contentWrapper">
+               <div id="authorImgContainer" class="author-img-container">
+                 <img id="prevAuthorImg" class="preview-author-img">
+               </div>
+               
+               <div class="text-block-wrapper">
+                  <div id="prevText" class="preview-text"></div>
+                  <div id="prevAuthorName" class="preview-author-name"></div>
+               </div>
+            </div>
+            
+            <img src="wordsara_logoo.png" class="preview-logo" onerror="this.style.display='none'">
+          </div>
         </div>
       </div>
+
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+
   <script>
-    // Initialize iro.js Color Picker for background
-    const colorPicker = new iro.ColorPicker("#backgroundColorPicker", {
-      width: 180,
-      layout: [{ component: iro.ui.Wheel, options: {} }],
-      color: "#000000"
+    // --- Variables ---
+    let bgImageSrc = null;
+    let colorPicker = new iro.ColorPicker("#iroPicker", { width: 180, color: "#000000" });
+
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', () => {
+      updatePreview();
     });
 
-    let backgroundImageUrl = null;
-    let currentFrameWidth = 360;
-    let currentTextAlignment = 'left';
-
-    function setTextAlignment(alignment) {
-      currentTextAlignment = alignment;
-      document.querySelectorAll('.alignment-buttons .btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      event.target.closest('button').classList.add('active');
-      updatePreview();
-    }
-
-    function setFrameSize(size, buttonElement) {
-      const container = document.getElementById("preview");
-      const buttons = document.querySelectorAll(".size-btn");
-      
-      buttons.forEach(btn => btn.classList.remove("active"));
-      buttonElement.classList.add("active");
-
-      if (size === "reel") {
-        container.style.aspectRatio = "9 / 16";
-        container.style.maxWidth = "360px";
-        currentFrameWidth = 360;
-      } else if (size === "square") {
-        container.style.aspectRatio = "1 / 1";
-        container.style.maxWidth = "360px";
-        currentFrameWidth = 360;
-      } else if (size === "landscape") {
-        container.style.aspectRatio = "16 / 9";
-        container.style.maxWidth = "640px";
-        currentFrameWidth = 640;
-      }
-      updatePreview();
-    }
-
-    function parseTextForColors(text, defaultColor) {
-      const regex = /\[color=(#[0-9A-Fa-f]{6})\](.*?)\[\/color\]/g;
-      let formattedText = text.replace(regex, '<span style="color: $1">$2</span>');
-      formattedText = `<span style="color: ${defaultColor}">${formattedText}</span>`;
-      return formattedText;
-    }
-
-    function updatePreview() {
-      const textInput = document.getElementById("textInput").value || "Default Text";
-      const author = document.getElementById("authorInput").value || "";
-      const fontSize = parseInt(document.getElementById("fontSizeSelect").value);
-      const isBold = document.getElementById("boldToggle").checked;
-      const isItalic = document.getElementById("italicToggle").checked;
-      const fontFamily = document.getElementById("fontFamilySelect").value;
-      const backgroundColor = colorPicker.color.hexString;
-      const textColorSelect = document.getElementById("textColorSelect").value;
-      const textColorHexInput = document.getElementById("textColorHexInput").value.trim();
-
-      const previewContainer = document.getElementById("preview");
-      const previewText = document.getElementById("previewText");
-      const previewAuthor = document.getElementById("previewAuthor");
-      const hexColorInput = document.getElementById("hexColorInput");
-
-      if (backgroundImageUrl) {
-        previewContainer.style.background = `url(${backgroundImageUrl})`;
-        previewContainer.style.backgroundSize = "cover";
-        previewContainer.style.backgroundPosition = "center";
-      } else {
-        previewContainer.style.background = backgroundColor;
-        previewContainer.style.backgroundSize = "";
-        previewContainer.style.backgroundPosition = "";
-      }
-
-      hexColorInput.value = backgroundColor.toUpperCase();
-
-      let defaultTextColor = textColorSelect;
-      if (textColorHexInput && /^#?[0-9A-Fa-f]{6}$/.test(textColorHexInput)) {
-        defaultTextColor = textColorHexInput.startsWith("#") ? textColorHexInput : "#" + textColorHexInput;
-      }
-
-      previewText.innerHTML = parseTextForColors(textInput, defaultTextColor);
-      previewText.style.fontSize = fontSize + "px";
-      previewText.style.fontWeight = isBold ? "bold" : "normal";
-      previewText.style.fontStyle = isItalic ? "italic" : "normal";
-      previewText.style.fontFamily = fontFamily;
-      previewText.style.color = defaultTextColor;
-      previewText.style.textAlign = currentTextAlignment;
-
-      const verticalMargin = 10;
-      previewText.style.marginTop = `${verticalMargin}px`;
-
-      previewAuthor.innerText = author ? `~ ${author}` : "";
-      previewAuthor.style.fontSize = (fontSize - 4) + "px";
-      previewAuthor.style.fontFamily = fontFamily;
-      previewAuthor.style.color = defaultTextColor;
-      previewAuthor.style.marginTop = `${verticalMargin}px`;
-
-      const authorImg = document.getElementById("authorImgPreview");
-      const file = document.getElementById("authorImageUpload").files[0];
-
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = function () {
-          authorImg.src = reader.result;
-          authorImg.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-      } else {
-        authorImg.src = "";
-        authorImg.style.display = "none";
-      }
-    }
-
-    function clearAllData() {
-      document.getElementById("textInput").value = "";
-      document.getElementById("authorInput").value = "";
-      document.getElementById("authorImageUpload").value = "";
-      document.getElementById("backgroundImageUpload").value = "";
-      backgroundImageUrl = null;
-      document.getElementById("fontSizeSelect").value = "16";
-      document.getElementById("boldToggle").checked = false;
-      document.getElementById("italicToggle").checked = false;
-      const reelBtn = document.querySelector(".size-btn .fa-mobile-screen-button").closest(".size-btn");
-      setFrameSize("reel", reelBtn);
-      document.getElementById("fontFamilySelect").value = "'Noto Sans Devanagari', sans-serif";
-      colorPicker.color.hexString = "#000000";
-      document.getElementById("hexColorInput").value = "#000000";
-      document.getElementById("textColorSelect").value = "#FFFFFF";
-      document.getElementById("textColorHexInput").value = "#FFFFFF";
-      setTextAlignment('left');
-      updatePreview();
-    }
+    // --- Event Listeners ---
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+      el.addEventListener('input', updatePreview);
+    });
 
     colorPicker.on('color:change', function(color) {
-      if (!backgroundImageUrl) {
-        document.getElementById("preview").style.background = color.hexString;
-      }
-      document.getElementById("hexColorInput").value = color.hexString.toUpperCase();
+      if(!bgImageSrc) document.getElementById('preview').style.background = color.hexString;
     });
 
-    document.getElementById("hexColorInput").addEventListener("input", function() {
-      let hex = this.value.trim();
-      if (/^#?[0-9A-Fa-f]{6}$/.test(hex)) {
-        if (!hex.startsWith("#")) {
-          hex = "#" + hex;
-        }
-        colorPicker.color.hexString = hex;
-        if (!backgroundImageUrl) {
-          document.getElementById("preview").style.background = hex;
-        }
-      }
-    });
-
-    document.getElementById("backgroundImageUpload").addEventListener("change", function() {
-      const file = this.files[0];
-      if (file) {
+    document.getElementById('bgImgInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if(file) {
         const reader = new FileReader();
-        reader.onloadend = function() {
-          backgroundImageUrl = reader.result;
-          document.getElementById("preview").style.background = `url(${backgroundImageUrl})`;
-          document.getElementById("preview").style.backgroundSize = "cover";
-          document.getElementById("preview").style.backgroundPosition = "center";
+        reader.onload = (evt) => {
+          bgImageSrc = evt.target.result;
           updatePreview();
         };
         reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById('authorImgInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const img = document.getElementById('prevAuthorImg');
+          const container = document.getElementById('authorImgContainer');
+          img.src = evt.target.result;
+          container.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // --- Core Function ---
+    function updatePreview() {
+      const text = document.getElementById('textInput').value;
+      const font = document.getElementById('fontFamilySelect').value;
+      const size = document.getElementById('fontSizeRange').value;
+      const color = document.getElementById('textColorPicker').value;
+      const isBold = document.getElementById('boldToggle').checked;
+      const hasShadow = document.getElementById('shadowToggle').checked;
+      const overlayOp = document.getElementById('overlayRange').value;
+      const author = document.getElementById('authorName').value;
+
+      document.getElementById('val-size').innerText = size + 'px';
+      document.getElementById('val-overlay').innerText = Math.round(overlayOp*100) + '%';
+
+      const pText = document.getElementById('prevText');
+      const pContainer = document.getElementById('preview');
+      const pOverlay = document.getElementById('previewOverlay');
+      const pAuthor = document.getElementById('prevAuthorName');
+
+      let formattedText = text.replace(/\[color=(.*?)\](.*?)\[\/color\]/g, '<span style="color:$1">$2</span>');
+      pText.innerHTML = formattedText;
+      pText.style.color = color;
+      pText.style.fontFamily = font;
+      pText.style.fontSize = size + 'px';
+      pText.style.fontWeight = isBold ? '700' : '400';
+      
+      if(hasShadow) {
+        pText.style.textShadow = "0px 2px 10px rgba(0,0,0,0.7)";
       } else {
-        backgroundImageUrl = null;
-        updatePreview();
+        pText.style.textShadow = "none";
       }
-    });
 
-    document.getElementById("textColorSelect").addEventListener("change", updatePreview);
-    document.getElementById("textColorHexInput").addEventListener("input", function() {
-      const hex = this.value.trim();
-      if (/^#?[0-9A-Fa-f]{6}$/.test(hex)) {
-        updatePreview();
+      if(bgImageSrc) {
+        pContainer.style.background = `url(${bgImageSrc}) center/cover no-repeat`;
+        pOverlay.style.opacity = overlayOp;
+      } else {
+        pContainer.style.background = colorPicker.color.hexString;
+        pOverlay.style.opacity = 0;
       }
-    });
 
-    function copyColorSyntax() {
-      const textToCopy = '[color=#FF0000]word[/color]';
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        const feedback = document.getElementById('copyFeedback');
-        feedback.style.display = 'inline';
-        setTimeout(() => {
-          feedback.style.display = 'none';
-        }, 2000);
-      }).catch(err => {
-        console.error('Failed to copy text:', err);
-        alert('Failed to copy text to clipboard. Please try again.');
-      });
+      pAuthor.innerText = author ? `~ ${author}` : "";
+      pAuthor.style.color = color;
+      pAuthor.style.fontFamily = font;
     }
 
-    function downloadWithScale() {
-      const previewContainer = document.getElementById("preview");
-      const loadingOverlay = document.getElementById("loadingOverlay");
-      const scaleSelect = document.getElementById("scaleSelectModal");
-      const scaleModal = bootstrap.Modal.getInstance(document.getElementById("scaleModal"));
+    // --- Helpers ---
 
-      loadingOverlay.style.display = "flex";
-      scaleModal.hide();
-
-      const scale = parseInt(scaleSelect.value);
-      const canvasWidth = previewContainer.offsetWidth * scale;
-      const canvasHeight = previewContainer.offsetHeight * scale;
-
-      const warningMessage = document.getElementById("warningMessage");
-      if (scale > 2) {
-        warningMessage.style.display = "block";
-        setTimeout(() => (warningMessage.style.display = "none"), 3000);
-      }
-
-      loadingOverlay.style.display = "none";
-
-      html2canvas(previewContainer, {
-        scale: scale,
-        useCORS: true,
-        backgroundColor: null,
-        logging: false
-      }).then((canvas) => {
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = canvasWidth;
-        tempCanvas.height = canvasHeight;
-        const ctx = tempCanvas.getContext("2d");
-        ctx.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
-
-        const link = document.createElement("a");
-        link.download = `reel-text-${scale}x.png`;
-        link.href = tempCanvas.toDataURL("image/png", 1.0);
-        link.click();
-
-        loadingOverlay.style.display = "none";
-      }).catch((error) => {
-        console.error(`Error generating ${scale}x PNG image:`, error);
-        alert("Failed to download image. Please try again.");
-        loadingOverlay.style.display = "none";
-      });
+    function setTextAlign(align, btn) {
+      // Main Text Alignment
+      document.getElementById('prevText').style.textAlign = align;
+      
+      // Align Wrapper Items based on text alignment
+      const wrapper = document.getElementById('contentWrapper');
+      if(align === 'center') wrapper.style.alignItems = 'center';
+      else if(align === 'right') wrapper.style.alignItems = 'flex-end';
+      else wrapper.style.alignItems = 'flex-start';
+      
+      setActive(btn);
     }
 
-    document.getElementById("textInput").addEventListener("input", updatePreview);
-    document.getElementById("authorInput").addEventListener("input", updatePreview);
-    document.getElementById("fontSizeSelect").addEventListener("change", updatePreview);
-    document.getElementById("boldToggle").addEventListener("change", updatePreview);
-    document.getElementById("italicToggle").addEventListener("change", updatePreview);
-    document.getElementById("authorImageUpload").addEventListener("change", updatePreview);
-    document.getElementById("fontFamilySelect").addEventListener("change", updatePreview);
+    function setYAlign(align, btn) {
+      document.getElementById('contentWrapper').style.justifyContent = align;
+      setActive(btn);
+    }
 
-    updatePreview();
+    function setFrame(type, btn) {
+      const p = document.getElementById('preview');
+      if(type === 'reel') { p.style.aspectRatio = "9/16"; p.style.maxWidth="360px"; }
+      else { p.style.aspectRatio = "1/1"; p.style.maxWidth="360px"; }
+      setActive(btn);
+    }
+
+    function setActive(btn) {
+      btn.parentNode.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function addHighlight() {
+      const textarea = document.getElementById('textInput');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      if (start === end) return;
+      const text = textarea.value;
+      const sel = text.substring(start, end);
+      textarea.value = text.substring(0, start) + `[color=#FFD700]${sel}[/color]` + text.substring(end);
+      updatePreview();
+    }
+
+    function downloadImage() {
+      const loader = document.getElementById('loadingOverlay');
+      loader.style.display = 'flex';
+      const previewElement = document.getElementById('preview');
+
+      // Remove border for download
+      previewElement.style.border = 'none';
+
+      setTimeout(() => {
+        html2canvas(previewElement, {
+          scale: 4, // MAXIMUM QUALITY (4x)
+          useCORS: true,
+          backgroundColor: null,
+          logging: false
+        }).then(canvas => {
+          previewElement.style.border = ''; // Restore border
+
+          const link = document.createElement('a');
+          link.download = 'wordsara_max_hd.png';
+          link.href = canvas.toDataURL('image/png', 1.0);
+          link.click();
+          loader.style.display = 'none';
+        }).catch(err => {
+          previewElement.style.border = '';
+          console.error(err);
+          alert('Error generating image.');
+          loader.style.display = 'none';
+        });
+      }, 800); // Increased delay slightly for 4x render
+    }
   </script>
 </body>
 </html>
