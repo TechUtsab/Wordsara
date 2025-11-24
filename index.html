@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wordsara Creator Ultimate</title>
+  <title>Wordsara Creator Pro - Gradient Edition</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Hind:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Teko:wght@400;600&display=swap"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -67,7 +67,6 @@
     .accordion-item { border-color: var(--border-color); }
     .accordion-button { color: #fff; background: transparent; }
 
-    /* Form Elements */
     .form-control, .form-select, .input-group-text {
       background-color: #2b2b2b;
       border: 1px solid #444;
@@ -117,43 +116,35 @@
       pointer-events: none;
     }
 
-    /* Layout Wrapper */
     .content-wrapper {
       position: relative;
       z-index: 2;
       width: 100%;
       height: 100%;
-      /* Increased bottom padding to prevent text overlapping with logo */
-      padding: 40px 30px 90px 30px; 
+      padding: 40px 25px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
     }
 
-    /* --- 1. IMAGE SCRATCH FIX (Technical) --- */
+    /* --- Author Image Fixed Size (Small) --- */
     .author-img-container {
-      width: 85px;
-      height: 85px;
+      width: 60px; /* Reduced to 60px as requested */
+      height: 60px;
       border-radius: 50%;
-      /* Mask Image forces the browser to clip cleanly during export */
       -webkit-mask-image: -webkit-radial-gradient(white, black);
       mask-image: radial-gradient(white, black);
       overflow: hidden;
-      border: 3px solid rgba(255,255,255,0.25);
+      border: 2px solid rgba(255,255,255,0.3);
       margin-bottom: 20px;
       display: none;
-      background: #000; /* Fallback bg */
+      background: #000;
+      flex-shrink: 0; /* Prevents squishing */
     }
 
-    .preview-author-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .preview-author-img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* --- 2. TEXT WRAPPER FOR ALIGNMENT --- */
     .text-block-wrapper {
       display: flex;
       flex-direction: column;
@@ -166,12 +157,21 @@
       overflow-wrap: break-word;
       line-height: 1.6;
       text-align: center; 
-      text-rendering: optimizeLegibility; /* Crisper text */
+      text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
     }
 
+    /* --- GRADIENT TEXT CLASS --- */
+    .text-gradient-active {
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      /* Note: Text-shadow must be none for gradient to show nicely, 
+         or use filter drop-shadow */
+    }
+
     .preview-author-name {
-      align-self: flex-end; /* Always Right aligned to text block */
+      align-self: flex-end; 
       margin-top: 10px;
       opacity: 0.95;
       font-size: 0.9em;
@@ -180,19 +180,20 @@
       letter-spacing: 0.5px;
     }
 
-    /* --- 3. PROFESSIONAL LOGO --- */
+    /* --- NEW LOGO POSITION (Flow Layout) --- */
     .preview-logo {
-      position: absolute;
-      bottom: 30px; 
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70px; 
+      position: relative; /* Part of the flow now */
+      display: block;
+      width: 65px; 
       opacity: 0.9;
       z-index: 3;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+      
+      /* "After 2 Paragraph Margin" Logic */
+      margin-top: 50px; 
     }
 
-    /* Loading Overlay */
+    /* Loading */
     .loading-overlay {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -219,7 +220,7 @@
 
   <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner-border" role="status"></div>
-    <div class="loading-text">Creating High Definition Image...</div>
+    <div class="loading-text">Generating Image...</div>
   </div>
 
   <nav class="app-bar">
@@ -238,30 +239,42 @@
           <div class="accordion" id="toolsAccordion">
             
             <div class="accordion-item">
-              <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelText">Typography</button></h2>
+              <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelText">Typography & Colors</button></h2>
               <div id="panelText" class="accordion-collapse collapse show" data-bs-parent="#toolsAccordion">
                 <div class="accordion-body">
                   <div class="mb-3">
-                     <label class="form-label d-flex justify-content-between">
-                       <span>Message</span>
-                       <button class="btn btn-xs btn-outline-warning py-0" style="font-size:0.7rem" onclick="addHighlight()">Highlight Word [Color]</button>
-                     </label>
                      <textarea class="form-control" id="textInput" rows="4">लोग कहते है [color=#FF0000]कुछ[/color] अपने दिल की सुनाओ..</textarea>
                   </div>
                   
-                  <div class="row g-2">
+                  <div class="row g-3 align-items-center mb-3">
+                    <div class="col-12">
+                      <div class="form-check form-switch p-0 d-flex gap-2 align-items-center">
+                        <label class="form-check-label fw-bold text-warning">Enable Gradient Text</label>
+                        <input class="form-check-input ms-2" type="checkbox" role="switch" id="gradientToggle">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row g-2 mb-3">
                     <div class="col-6">
-                      <label>Font</label>
+                      <label class="small text-muted">Primary Color</label>
+                      <input type="color" class="form-control form-control-color w-100" id="textColorPicker" value="#ffffff">
+                    </div>
+                    <div class="col-6" id="gradientColorDiv" style="display:none;">
+                      <label class="small text-muted">Gradient End Color</label>
+                      <input type="color" class="form-control form-control-color w-100" id="gradientColorPicker" value="#10a37f">
+                    </div>
+                  </div>
+
+                  <div class="row g-2">
+                    <div class="col-12">
+                      <label>Font Family</label>
                       <select class="form-select" id="fontFamilySelect">
                         <option value="'Noto Sans Devanagari', sans-serif">Hindi (Noto)</option>
                         <option value="'Mukta', sans-serif">Hindi (Mukta)</option>
                         <option value="'Poppins', sans-serif">English (Poppins)</option>
                         <option value="'Teko', sans-serif">Headlines (Teko)</option>
                       </select>
-                    </div>
-                    <div class="col-6">
-                      <label>Text Color</label>
-                      <input type="color" class="form-control form-control-color w-100" id="textColorPicker" value="#ffffff">
                     </div>
                   </div>
 
@@ -363,9 +376,9 @@
                   <div id="prevText" class="preview-text"></div>
                   <div id="prevAuthorName" class="preview-author-name"></div>
                </div>
+
+               <img src="wordsara_logoo.png" class="preview-logo" onerror="this.style.display='none'">
             </div>
-            
-            <img src="wordsara_logoo.png" class="preview-logo" onerror="this.style.display='none'">
           </div>
         </div>
       </div>
@@ -390,6 +403,12 @@
     // --- Event Listeners ---
     document.querySelectorAll('input, select, textarea').forEach(el => {
       el.addEventListener('input', updatePreview);
+    });
+
+    // Toggle for Gradient Inputs
+    document.getElementById('gradientToggle').addEventListener('change', function() {
+       document.getElementById('gradientColorDiv').style.display = this.checked ? 'block' : 'none';
+       updatePreview();
     });
 
     colorPicker.on('color:change', function(color) {
@@ -427,7 +446,11 @@
       const text = document.getElementById('textInput').value;
       const font = document.getElementById('fontFamilySelect').value;
       const size = document.getElementById('fontSizeRange').value;
-      const color = document.getElementById('textColorPicker').value;
+      
+      const color1 = document.getElementById('textColorPicker').value;
+      const color2 = document.getElementById('gradientColorPicker').value;
+      const useGradient = document.getElementById('gradientToggle').checked;
+
       const isBold = document.getElementById('boldToggle').checked;
       const hasShadow = document.getElementById('shadowToggle').checked;
       const overlayOp = document.getElementById('overlayRange').value;
@@ -441,19 +464,40 @@
       const pOverlay = document.getElementById('previewOverlay');
       const pAuthor = document.getElementById('prevAuthorName');
 
+      // 1. Text Parsing & Gradient Logic
       let formattedText = text.replace(/\[color=(.*?)\](.*?)\[\/color\]/g, '<span style="color:$1">$2</span>');
       pText.innerHTML = formattedText;
-      pText.style.color = color;
+      
       pText.style.fontFamily = font;
       pText.style.fontSize = size + 'px';
       pText.style.fontWeight = isBold ? '700' : '400';
+
+      if(useGradient) {
+        pText.classList.add('text-gradient-active');
+        pText.style.backgroundImage = `linear-gradient(45deg, ${color1}, ${color2})`;
+        pText.style.color = 'transparent'; // Fallback
+      } else {
+        pText.classList.remove('text-gradient-active');
+        pText.style.backgroundImage = 'none';
+        pText.style.color = color1;
+      }
       
+      // Shadow Logic (Conflict handling with Gradient)
       if(hasShadow) {
-        pText.style.textShadow = "0px 2px 10px rgba(0,0,0,0.7)";
+        if(useGradient) {
+          // Use Filter for gradient text
+          pText.style.filter = "drop-shadow(2px 2px 4px rgba(0,0,0,0.6))";
+          pText.style.textShadow = "none";
+        } else {
+          pText.style.filter = "none";
+          pText.style.textShadow = "0px 2px 10px rgba(0,0,0,0.7)";
+        }
       } else {
         pText.style.textShadow = "none";
+        pText.style.filter = "none";
       }
 
+      // 2. Background
       if(bgImageSrc) {
         pContainer.style.background = `url(${bgImageSrc}) center/cover no-repeat`;
         pOverlay.style.opacity = overlayOp;
@@ -462,8 +506,9 @@
         pOverlay.style.opacity = 0;
       }
 
+      // 3. Author Info
       pAuthor.innerText = author ? `~ ${author}` : "";
-      pAuthor.style.color = color;
+      pAuthor.style.color = color1; // Author always takes primary color
       pAuthor.style.fontFamily = font;
     }
 
@@ -506,36 +551,32 @@
       updatePreview();
     }
 
-    // --- Download Fix ---
     function downloadImage() {
       const loader = document.getElementById('loadingOverlay');
       loader.style.display = 'flex';
       const previewElement = document.getElementById('preview');
 
-      // 1. Temporarily remove border for download
       previewElement.style.border = 'none';
 
-      // 2. Delay to allow DOM update
       setTimeout(() => {
         html2canvas(previewElement, {
-          scale: 4, // 4x Quality
+          scale: 4, 
           useCORS: true,
           backgroundColor: null,
           logging: false,
           allowTaint: true
         }).then(canvas => {
-          // Restore Border
           previewElement.style.border = ''; 
 
           const link = document.createElement('a');
-          link.download = 'wordsara_hd.png';
+          link.download = 'wordsara_gradient.png';
           link.href = canvas.toDataURL('image/png', 1.0);
           link.click();
           loader.style.display = 'none';
         }).catch(err => {
           previewElement.style.border = '';
           console.error(err);
-          alert('Error: Please try removing the background image or use a different one.');
+          alert('Error generating image.');
           loader.style.display = 'none';
         });
       }, 800);
