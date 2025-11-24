@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wordsara Creator</title>
+  <title>Wordsara Creator Pro Ultimate</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Hind:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Teko:wght@400;600&display=swap"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
@@ -104,6 +104,417 @@
       overflow: hidden;
       box-shadow: 0 10px 40px rgba(0,0,0,0.6);
       border: 1px solid #333;
+      display: flex;
+      flex-direction: column; 
+    }
+
+    .bg-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #000;
+      opacity: 0; 
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Padding bottom increased to avoid overlap with Logo */
+    .content-wrapper {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      padding: 40px 30px 80px 30px; /* Extra bottom padding for logo space */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .author-img-container {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid rgba(255,255,255,0.3);
+      margin-bottom: 20px;
+      display: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transform: translateZ(0); 
+    }
+
+    .preview-author-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* --- KEY FIX: Dynamic Wrapper for Perfect Alignment --- */
+    .text-block-wrapper {
+      display: flex;
+      flex-direction: column;
+      /* "fit-content" ensures the box is exactly as wide as the text, 
+         so the author name sits at the exact right edge */
+      width: fit-content; 
+      max-width: 100%;
+    }
+
+    .preview-text {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      line-height: 1.6;
+      text-align: center; /* Default align inside the block */
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .preview-author-name {
+      align-self: flex-end; /* Forces element to the right of the wrapper */
+      margin-top: 10px;
+      opacity: 0.9;
+      font-size: 0.85em;
+      text-align: right;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      /* Ensures it doesn't wrap weirdly */
+      white-space: nowrap; 
+    }
+
+    /* --- PROFESSIONAL LOGO POSITIONING --- */
+    .preview-logo {
+      position: absolute;
+      bottom: 35px; /* Perfect spacing from bottom */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 65px; /* Professional subtle size */
+      opacity: 0.85; /* Slight transparency for watermark feel */
+      z-index: 3;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.7)); /* Visible on any bg */
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: var(--primary-color);
+      backdrop-filter: blur(5px);
+    }
+    
+    .spinner-border { width: 4rem; height: 4rem; border-width: 4px; }
+    .loading-text { margin-top: 15px; font-size: 1.2rem; color: white; font-weight: 500; }
+
+    .btn-tool { border: 1px solid #444; color: #ccc; }
+    .btn-tool.active { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
+    .range-value { font-size: 0.8rem; color: #888; }
+    .iro-center { display: flex; justify-content: center; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner-border" role="status"></div>
+    <div class="loading-text">Generating Maximum Quality Image...</div>
+  </div>
+
+  <nav class="app-bar">
+    <div class="d-flex align-items-center">
+      <i class="fa-solid fa-pen-nib me-2 text-success"></i>
+      <span class="brand-title">Wordsara Creator Pro</span>
+    </div>
+    <button class="btn btn-sm btn-outline-light" onclick="location.reload()">Reset</button>
+  </nav>
+
+  <div class="container-fluid main-container">
+    <div class="row g-4">
+      
+      <div class="col-lg-7 col-md-6">
+        <div class="controls-wrapper">
+          <div class="accordion" id="toolsAccordion">
+            
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelText">Typography</button></h2>
+              <div id="panelText" class="accordion-collapse collapse show" data-bs-parent="#toolsAccordion">
+                <div class="accordion-body">
+                  <div class="mb-3">
+                     <label class="form-label d-flex justify-content-between">
+                       <span>Message</span>
+                       <button class="btn btn-xs btn-outline-warning py-0" style="font-size:0.7rem" onclick="addHighlight()">Highlight Word [Color]</button>
+                     </label>
+                     <textarea class="form-control" id="textInput" rows="4">लोग कहते है [color=#FF0000]कुछ[/color] अपने दिल की सुनाओ..</textarea>
+                  </div>
+                  
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label>Font</label>
+                      <select class="form-select" id="fontFamilySelect">
+                        <option value="'Noto Sans Devanagari', sans-serif">Hindi (Noto)</option>
+                        <option value="'Mukta', sans-serif">Hindi (Mukta)</option>
+                        <option value="'Poppins', sans-serif">English (Poppins)</option>
+                        <option value="'Teko', sans-serif">Headlines (Teko)</option>
+                      </select>
+                    </div>
+                    <div class="col-6">
+                      <label>Text Color</label>
+                      <input type="color" class="form-control form-control-color w-100" id="textColorPicker" value="#ffffff">
+                    </div>
+                  </div>
+
+                  <div class="mt-3">
+                    <label>Size: <span id="val-size">14px</span></label>
+                    <input type="range" class="form-range" id="fontSizeRange" min="8" max="60" value="14">
+                  </div>
+                  
+                  <div class="d-flex gap-2 mt-3">
+                     <input type="checkbox" class="btn-check" id="boldToggle">
+                     <label class="btn btn-outline-secondary btn-sm" for="boldToggle">Bold</label>
+                     
+                     <input type="checkbox" class="btn-check" id="shadowToggle">
+                     <label class="btn btn-outline-secondary btn-sm" for="shadowToggle">Shadow</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelAlign">Layout</button></h2>
+              <div id="panelAlign" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
+                <div class="accordion-body">
+                  <div class="btn-group w-100 mb-3">
+                    <button class="btn btn-tool" onclick="setTextAlign('left', this)"><i class="fa-solid fa-align-left"></i></button>
+                    <button class="btn btn-tool active" onclick="setTextAlign('center', this)"><i class="fa-solid fa-align-center"></i></button>
+                    <button class="btn btn-tool" onclick="setTextAlign('right', this)"><i class="fa-solid fa-align-right"></i></button>
+                  </div>
+                  <div class="btn-group w-100 mb-3">
+                     <button class="btn btn-tool" onclick="setYAlign('flex-start', this)">Top</button>
+                     <button class="btn btn-tool active" onclick="setYAlign('center', this)">Middle</button>
+                     <button class="btn btn-tool" onclick="setYAlign('flex-end', this)">Bottom</button>
+                  </div>
+                  <div class="btn-group w-100">
+                     <button class="btn btn-tool active" onclick="setFrame('reel', this)">Reel (9:16)</button>
+                     <button class="btn btn-tool" onclick="setFrame('square', this)">Square (1:1)</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelBg">Background</button></h2>
+              <div id="panelBg" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
+                <div class="accordion-body">
+                   <ul class="nav nav-tabs mb-3" id="bgTab">
+                     <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabColor">Color</button></li>
+                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabImg">Image</button></li>
+                   </ul>
+                   
+                   <div class="tab-content">
+                     <div class="tab-pane fade show active" id="tabColor">
+                       <div id="iroPicker" class="iro-center"></div>
+                     </div>
+                     <div class="tab-pane fade" id="tabImg">
+                       <input type="file" class="form-control mb-3" id="bgImgInput" accept="image/*">
+                       <label>Dark Overlay: <span id="val-overlay">0%</span></label>
+                       <input type="range" class="form-range" id="overlayRange" min="0" max="0.9" step="0.1" value="0">
+                     </div>
+                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelAuthor">Author</button></h2>
+              <div id="panelAuthor" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
+                <div class="accordion-body">
+                   <input type="text" class="form-control mb-2" id="authorName" placeholder="Author Name">
+                   <input type="file" class="form-control" id="authorImgInput" accept="image/*">
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="p-3 bg-dark border-top border-secondary">
+             <button class="btn btn-custom w-100 py-3" onclick="downloadImage()">
+               <i class="fa-solid fa-download me-2"></i> Download Max Quality Image
+             </button>
+             <div class="text-center mt-2 text-muted small">Generates 4x Ultra HD PNG</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 col-md-6">
+        <div class="preview-sticky-wrapper">
+          <div class="text-muted mb-2 small"><i class="fa-regular fa-eye"></i> Live Preview</div>
+          
+          <div id="preview" class="preview-container">
+            <div class="bg-overlay" id="previewOverlay"></div>
+            
+            <div class="content-wrapper" id="contentWrapper">
+               <div id="authorImgContainer" class="author-img-container">
+                 <img id="prevAuthorImg" class="preview-author-img">
+               </div>
+               
+               <div class="text-block-wrapper">
+                  <div id="prevText" class="preview-text"></div>
+                  <div id="prevAuthorName" class="preview-author-name"></div>
+               </div>
+            </div>
+            
+            <img src="wordsara_logoo.png" class="preview-logo" onerror="this.style.display='none'">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+
+  <script>
+    // --- Variables ---
+    let bgImageSrc = null;
+    let colorPicker = new iro.ColorPicker("#iroPicker", { width: 180, color: "#000000" });
+
+    // --- Init ---
+    document.addEventListener('DOMContentLoaded', () => {
+      updatePreview();
+    });
+
+    // --- Event Listeners ---
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+      el.addEventListener('input', updatePreview);
+    });
+
+    colorPicker.on('color:change', function(color) {
+      if(!bgImageSrc) document.getElementById('preview').style.background = color.hexString;
+    });
+
+    document.getElementById('bgImgInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          bgImageSrc = evt.target.result;
+          updatePreview();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById('authorImgInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if(file) {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const img = document.getElementById('prevAuthorImg');
+          const container = document.getElementById('authorImgContainer');
+          img.src = evt.target.result;
+          container.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // --- Core Function ---
+    function updatePreview() {
+      const text = document.getElementById('textInput').value;
+      const font = document.getElementById('fontFamilySelect').value;
+      const size = document.getElementById('fontSizeRange').value;
+      const color = document.getElementById('textColorPicker').value;
+      const isBold = document.getElementById('boldToggle').checked;
+      const hasShadow = document.getElementById('shadowToggle').checked;
+      const overlayOp = document.getElementById('overlayRange').value;
+      const author = document.getElementById('authorName').value;
+
+      document.getElementById('val-size').innerText = size + 'px';
+      document.getElementById('val-overlay').innerText = Math.round(overlayOp*100) + '%';
+
+      const pText = document.getElementById('prevText');
+      const pContainer = document.getElementById('preview');
+      const pOverlay = document.getElementById('previewOverlay');
+      const pAuthor = document.getElementById('prevAuthorName');
+
+      let formattedText = text.replace(/\[color=(.*?)\](.*?)\[\/color\]/g, '<span style="color:$1">$2</span>');
+      pText.innerHTML = formattedText;
+      pText.style.color = color;
+      pText.style.fontFamily = font;
+      pText.style.fontSize = size + 'px';
+      pText.style.fontWeight = isBold ? '700' : '400';
+      
+      if(hasShadow) {
+        pText.style.textShadow = "0px 2px 10px rgba(0,0,0,0.7)";
+      } else {
+        pText.style.textShadow = "none";
+      }
+
+      if(bgImageSrc) {
+        pContainer.style.background = `url(${bgImageSrc}) center/cover no-repeat`;
+        pOverlay.style.opacity = overlayOp;
+      } else {
+        pContainer.style.background = colorPicker.color.hexString;
+        pOverlay.style.opacity = 0;
+      }
+
+      pAuthor.innerText = author ? `~ ${author}` : "";
+      pAuthor.style.color = color;
+      pAuthor.style.fontFamily = font;
+    }
+
+    // --- Helpers ---
+
+    function setTextAlign(align, btn) {
+      // Sets the text alignment inside the text block
+      document.getElementById('prevText').style.textAlign = align;
+      
+      // Also adjusts the flex wrapper to align appropriately in the large container
+      const wrapper = document.getElementById('contentWrapper');
+      if(align === 'center') wrapper.style.alignItems = 'center';
+      else if(align === 'right') wrapper.style.alignItems = 'flex-end';
+      else wrapper.style.alignItems = 'flex-start';
+      
+      setActive(btn);
+    }
+
+    function setYAlign(align, btn) {
+      document.getElementById('contentWrapper').style.justifyContent = align;
+      setActive(btn);
+    }
+
+    function setFrame(type, btn) {
+      const p = document.getElementById('preview');
+      if(type === 'reel') { p.style.aspectRatio = "9/16"; p.style.maxWidth="360px"; }
+      else { p.style.aspectRatio = "1/1"; p.style.maxWidth="360px"; }
+      setActive(btn);
+    }
+
+    function setActive(btn) {
+      btn.parentNode.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function addHighlight() {
+      const textarea = document.getElementById('textInput');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      if (start === end) return;
+      const text = textarea.value;
+      const sel = text.substring(start, end);
+      textarea.value = text.substring(0, start) + `[color=#FFD700]${sel}[/color]` + text.substring(end);
+      updatePreview();
+    }
+
+    function downloadImage() {
+      const loader = document.getElementById('loadingOverlay');
+      loader.style.display = 'flex';
+      const previewElement = document.getElementById('preview');
+
+      // Remove border for download
+      previewElement.style.border =      border: 1px solid #333;
       display: flex;
       flex-direction: column; 
     }
