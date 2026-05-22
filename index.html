@@ -9,24 +9,37 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     :root { --oled-black: #000000; --neon-green: #39FF14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.12); }
-    body { background-color: var(--oled-black); color: #fff; font-family: 'Poppins', sans-serif; padding-top: 80px; }
     
-    .app-bar { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); padding: 0.8rem 2rem; position: fixed; top: 0; width: 100%; z-index: 2000; display: flex; justify-content: space-between; align-items: center; }
-    
-    .main-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; justify-items: center; }
-    @media (min-width: 992px) { .main-grid { grid-template-columns: 1fr 1fr; align-items: start; } }
+    /* FIX: Prevents elements from expanding beyond screen width */
+    * { box-sizing: border-box; }
 
-    .control-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 28px; padding: 2rem; width: 100%; max-width: 500px; }
+    body { 
+      background-color: var(--oled-black); 
+      color: #fff; 
+      font-family: 'Poppins', sans-serif; 
+      padding-top: 80px; 
+      overflow-x: hidden; /* Hides horizontal scroll completely */
+      width: 100vw; 
+      margin: 0;
+    }
+    
+    .app-bar { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); padding: 0.8rem 1.5rem; position: fixed; top: 0; width: 100%; z-index: 2000; display: flex; justify-content: space-between; align-items: center; }
+    
+    .main-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; width: 100%; max-width: 1400px; margin: 1rem auto; padding: 0 1rem; justify-items: center; }
+    @media (min-width: 992px) { .main-grid { grid-template-columns: 1fr 1fr; align-items: start; padding: 0 1.5rem; } }
+
+    .control-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 28px; padding: 2rem; width: 100%; max-width: 500px; margin: 0 auto; }
     .section-label { color: var(--neon-green); font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 0.8rem; text-transform: uppercase; }
     .section-label i { margin-right: 8px; color: #fff; }
 
-    .color-palette { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 15px; }
+    .color-palette { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 15px; justify-content: center; }
     .color-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: 0.3s; }
     .color-btn:hover { transform: scale(1.1); border-color: #fff; }
 
     .big-editor { background: rgba(0,0,0,0.5) !important; border: 1px solid var(--glass-border) !important; color: #fff !important; border-radius: 15px; font-size: 1.1rem; padding: 1.2rem !important; }
 
-    .preview-stage { width: 100%; display: flex; justify-content: center; align-items: center; }
+    .preview-stage { width: 100%; display: flex; justify-content: center; align-items: flex-start; overflow: hidden; padding-bottom: 2rem; }
+    
     .studio-border-wrapper { 
       padding: 12px; 
       background: #111; 
@@ -34,25 +47,37 @@
       border-radius: 24px; 
       box-shadow: 0 0 40px rgba(57, 255, 20, 0.15);
       display: inline-block;
+      transition: transform 0.3s ease;
+      transform-origin: top center;
+      margin: 0 auto; /* FIX: Forces center alignment */
+    }
+
+    /* --- MOBILE RESPONSIVE FIXES --- */
+    @media (max-width: 500px) {
+      .app-bar { padding: 0.6rem 1rem; }
+      .app-bar .h4 { font-size: 1.2rem !important; }
+      .control-panel { padding: 1.2rem; }
+      .studio-border-wrapper { transform: scale(0.85); margin-bottom: -90px; }
+    }
+    @media (max-width: 400px) {
+      .app-bar .h4 { font-size: 1.1rem !important; }
+      .app-bar .btn { font-size: 1rem !important; padding: 0.3rem 0.6rem; }
+      .studio-border-wrapper { transform: scale(0.72); margin-bottom: -160px; }
+    }
+    @media (max-width: 350px) {
+      .control-panel { padding: 1rem; }
+      .studio-border-wrapper { transform: scale(0.62); margin-bottom: -220px; }
     }
 
     .preview-box { background: #000; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 14px; }
     .reel-frame { width: 340px; height: 604px; }
     .square-frame { width: 400px; height: 400px; }
     
-    /* FIX: Image Quality Fix using native HTML <img> */
-    .bg-layer { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
-    #realBgImg { 
-      width: 100%; 
-      height: 100%; 
-      object-fit: cover; 
-      object-position: center; 
-      display: none; 
-      transition: transform 0.1s, filter 0.1s, opacity 0.1s; 
-    }
+    .bg-layer { position: absolute; inset: 0; z-index: 0; overflow: hidden; transition: transform 0.1s, filter 0.1s, opacity 0.1s; }
+    #realBgImg { width: 100%; height: 100%; object-fit: cover; object-position: center; display: none; }
     
     .overlay-dim { position: absolute; inset: 0; z-index: 1; }
-    .content-area { position: relative; z-index: 10; width: 80%; display: flex; flex-direction: column; }
+    .content-area { position: relative; z-index: 10; width: 80%; display: flex; flex-direction: column; align-items: center; }
     .main-text { line-height: 1.6; text-shadow: 0 2px 10px #000; white-space: pre-wrap; word-wrap: break-word; }
     .author-meta { margin-top: 20px; font-weight: 700; opacity: 0.9; text-align: right; width: 100%; }
 
@@ -65,7 +90,12 @@
 
     .btn-group-custom .btn { border: 1px solid var(--glass-border); color: #fff; background: rgba(255,255,255,0.05); }
     .btn-group-custom .btn.active { background: var(--neon-green); color: #000; }
-    .btn-export { background: linear-gradient(45deg, var(--neon-green), #24f000); color: #000; font-weight: 800; border: none; padding: 1.1rem; border-radius: 15px; width: 100%; transition: 0.3s; margin-top: 10px; }
+    
+    .btn-export { background: linear-gradient(45deg, var(--neon-green), #24f000); color: #000; font-weight: 800; border: none; padding: 1rem; border-radius: 12px; width: 100%; transition: 0.3s; margin-top: 10px; }
+    .btn-export:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(57, 255, 20, 0.2); }
+    
+    .btn-video { background: linear-gradient(45deg, #00D2FF, #3a7bd5); color: #fff; font-weight: 800; border: none; padding: 1rem; border-radius: 12px; width: 100%; transition: 0.3s; }
+    .btn-video:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2); }
 
     #loader { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
     
@@ -84,7 +114,7 @@
 
   <div class="main-grid">
     <div class="control-panel">
-      <!-- 1. Text Designer -->
+      <!-- Text Designer -->
       <div class="mb-4">
         <div class="d-flex justify-content-between align-items-center mb-2">
             <p class="section-label m-0"><i class="fa-solid fa-file-pen"></i>Content Designer</p>
@@ -102,7 +132,7 @@
         </div>
       </div>
 
-      <!-- 2. Typography -->
+      <!-- Typography -->
       <div class="row g-3 mb-4">
         <div class="col-6">
           <p class="section-label"><i class="fa-solid fa-spell-check"></i>Typography</p>
@@ -120,7 +150,7 @@
         </div>
       </div>
 
-      <!-- 3. Alignment & Size -->
+      <!-- Alignment & Size -->
       <div class="row g-3 mb-4">
         <div class="col-6"><p class="section-label"><i class="fa-solid fa-align-center"></i>Align</p>
           <div class="btn-group btn-group-custom w-100">
@@ -132,7 +162,7 @@
         <div class="col-6"><p class="section-label"><i class="fa-solid fa-text-height"></i>Size</p><input type="number" class="form-control" id="mSize" value="15" oninput="update()"></div>
       </div>
 
-      <!-- 4. Ratio & Global Dim -->
+      <!-- Ratio & Global Dim -->
       <div class="row g-3 mb-4">
         <div class="col-6"><p class="section-label"><i class="fa-solid fa-crop-simple"></i>Ratio</p>
           <select class="form-select" id="mFrame" onchange="update()"><option value="reel-frame">9:16 Reel</option><option value="square-frame">1:1 Post</option></select>
@@ -140,44 +170,55 @@
         <div class="col-6"><p class="section-label"><i class="fa-solid fa-moon"></i>Text Dim</p><input type="number" class="form-control" id="mDim" value="5" min="0" max="9" oninput="update()"></div>
       </div>
 
-      <!-- 5. Author Name -->
+      <!-- Author Name -->
       <div class="mb-4"><p class="section-label"><i class="fa-solid fa-user-edit"></i>Author Name</p><input type="text" class="form-control" id="mAuth" placeholder="Your Name" oninput="update()"></div>
       
-      <!-- 6. Background Image & Dynamic Controls -->
+      <!-- Background Image & Dynamic Controls -->
       <div class="mb-4">
         <p class="section-label"><i class="fa-solid fa-image"></i>Background</p>
         <input type="file" class="form-control" id="mBg" accept="image/*">
         
         <div id="bgControls" class="mt-3 p-3" style="display: none; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);">
           <p class="section-label text-warning mb-3"><i class="fa-solid fa-sliders"></i> Image Tuning</p>
-          
           <label class="form-label text-light mb-0" style="font-size: 0.8rem;">Zoom In/Out</label>
           <input type="range" class="form-range custom-range mb-2" id="mZoom" min="1" max="3" step="0.05" value="1" oninput="update()">
-          
           <label class="form-label text-light mb-0" style="font-size: 0.8rem;">Blur (Clear to Blurred)</label>
           <input type="range" class="form-range custom-range mb-2" id="mBlur" min="0" max="25" step="1" value="0" oninput="update()">
-
           <label class="form-label text-light mb-0" style="font-size: 0.8rem;">Visibility (Opacity)</label>
           <input type="range" class="form-range custom-range" id="mOpacity" min="0.1" max="1" step="0.1" value="1" oninput="update()">
         </div>
       </div>
       
-      <p class="section-label"><i class="fa-solid fa-wand-magic-sparkles"></i>Export Quality</p>
-      <select class="form-select mb-3" id="mQuality">
-        <option value="4" selected>4K Resolution</option>
-        <option value="8">8K Master</option>
-        <option value="16">16K Extreme</option>
-      </select>
-      
-      <button class="btn btn-export" onclick="exportImg()"><i class="fa-solid fa-download me-2"></i> DOWNLOAD STUDIO IMAGE</button>
+      <hr style="border-color: rgba(255,255,255,0.2);">
+
+      <!-- EXPORT OPTIONS -->
+      <div class="row g-3 mb-2">
+        <div class="col-md-6">
+           <p class="section-label"><i class="fa-solid fa-image"></i> Image Export</p>
+           <select class="form-select mb-2" id="mQuality">
+             <option value="4" selected>4K Resolution</option>
+             <option value="8">8K Master</option>
+           </select>
+           <button class="btn btn-export" onclick="exportImg()"><i class="fa-solid fa-download me-2"></i> SAVE IMAGE</button>
+        </div>
+        
+        <div class="col-md-6">
+           <p class="section-label text-info"><i class="fa-solid fa-video"></i> Video Export (1080p)</p>
+           <select class="form-select mb-2" id="mVidDuration">
+             <option value="15" selected>15 Seconds (Short Reel)</option>
+             <option value="30">30 Seconds (Standard)</option>
+             <option value="50">50 Seconds (Long)</option>
+           </select>
+           <button class="btn btn-video" onclick="exportVideo()"><i class="fa-solid fa-film me-2"></i> SAVE VIDEO</button>
+        </div>
+      </div>
     </div>
 
-    <!-- 7. Preview Stage -->
+    <!-- Preview Stage -->
     <div class="preview-stage">
       <div class="studio-border-wrapper">
         <div class="preview-box reel-frame" id="exportArea">
           
-          <!-- FIX: Added native img tag instead of css background -->
           <div class="bg-layer" id="bgLayer">
             <img id="realBgImg" src="" alt="Background">
           </div>
@@ -274,8 +315,9 @@
       pAuth.style.fontFamily = font;
       pAuth.style.fontWeight = isBold ? "700" : "400";
 
-      // FIX: Use native image element instead of background-image for crisp exports
       const realBgImg = document.getElementById('realBgImg');
+      const bgLayer = document.getElementById('bgLayer');
+
       if(bgData) {
         const zoom = document.getElementById('mZoom').value;
         const blur = document.getElementById('mBlur').value;
@@ -283,12 +325,16 @@
         
         realBgImg.style.display = 'block';
         realBgImg.src = bgData;
-        realBgImg.style.transform = `scale(${zoom})`;
-        realBgImg.style.filter = `blur(${blur}px)`;
-        realBgImg.style.opacity = opacity;
+        
+        bgLayer.style.transform = `scale(${zoom})`;
+        bgLayer.style.filter = `blur(${blur}px)`;
+        bgLayer.style.opacity = opacity;
       } else {
         realBgImg.style.display = 'none';
         realBgImg.src = '';
+        bgLayer.style.transform = `scale(1)`;
+        bgLayer.style.filter = `blur(0px)`;
+        bgLayer.style.opacity = 1;
       }
     }
 
@@ -304,51 +350,134 @@
       const fr = new FileReader();
       fr.onload = () => {
         bgData = fr.result;
-        
         document.getElementById('bgControls').style.display = 'block';
         document.getElementById('mZoom').value = 1;
         document.getElementById('mBlur').value = 0;
         document.getElementById('mOpacity').value = 1;
-        
         update();
       };
       fr.onerror = () => alert("Image loading failed.");
       fr.readAsDataURL(file);
     };
 
+    // --- IMAGE EXPORT ---
     async function exportImg() {
       const l = document.getElementById('loader'), a = document.getElementById('exportArea');
       const lt = document.getElementById('loaderText');
       const q = parseInt(document.getElementById('mQuality').value);
       
       l.style.display = 'flex';
-      if(q >= 8) lt.innerText = "RENDERING " + q + "K QUALITY (PLEASE WAIT)...";
+      lt.innerText = "RENDERING IMAGE...";
       
+      const wrapper = document.querySelector('.studio-border-wrapper');
+      const originalTransform = wrapper.style.transform;
+      wrapper.style.transform = 'none';
       const originalRadius = a.style.borderRadius;
       a.style.borderRadius = "0px";
 
-      const safeScale = Math.min(q, 4);
-
       setTimeout(async () => {
         try {
-          const canvas = await html2canvas(a, { 
-            scale: safeScale,
-            useCORS: true,
-            backgroundColor: "#000000",
-            logging: false
-          });
+          const canvas = await html2canvas(a, { scale: q, useCORS: true, backgroundColor: "#000000", logging: false });
           const link = document.createElement('a');
-          link.download = `Wordsara_${q}K_${Date.now()}.png`;
+          link.download = `Wordsara_Image_${Date.now()}.png`;
           link.href = canvas.toDataURL("image/png", 1.0);
           link.click();
         } catch(e) {
-            alert("Export failed. Device memory low for " + q + "K. Try 4K.");
+            alert("Export failed. Try 4K.");
         } finally { 
           a.style.borderRadius = originalRadius; 
+          wrapper.style.transform = originalTransform;
           l.style.display = 'none'; 
-          lt.innerText = "STUDIO RENDERING...";
         }
-      }, 800);
+      }, 500);
+    }
+
+    // --- VIDEO EXPORT ---
+    async function exportVideo() {
+      const duration = parseInt(document.getElementById('mVidDuration').value);
+      const l = document.getElementById('loader');
+      const lt = document.getElementById('loaderText');
+      const a = document.getElementById('exportArea');
+      
+      l.style.display = 'flex';
+      lt.innerText = "PREPARING VIDEO FRAMES...";
+      
+      const wrapper = document.querySelector('.studio-border-wrapper');
+      const originalTransform = wrapper.style.transform;
+      wrapper.style.transform = 'none';
+      const originalRadius = a.style.borderRadius;
+      a.style.borderRadius = "0px";
+
+      try {
+        const targetWidth = 1080;
+        const scale = targetWidth / a.offsetWidth;
+
+        const staticCanvas = await html2canvas(a, {
+          scale: scale,
+          useCORS: true,
+          backgroundColor: "#000000",
+          logging: false
+        });
+
+        a.style.borderRadius = originalRadius;
+        wrapper.style.transform = originalTransform;
+
+        const videoCanvas = document.createElement('canvas');
+        videoCanvas.width = staticCanvas.width;
+        videoCanvas.height = staticCanvas.height;
+        const ctx = videoCanvas.getContext('2d');
+
+        const mimeTypes = ['video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+        let selectedMime = '';
+        for (let mime of mimeTypes) {
+            if (MediaRecorder.isTypeSupported(mime)) {
+                selectedMime = mime;
+                break;
+            }
+        }
+
+        const stream = videoCanvas.captureStream(30);
+        const recorder = new MediaRecorder(stream, { 
+          mimeType: selectedMime,
+          videoBitsPerSecond: 5000000
+        });
+
+        const chunks = [];
+        recorder.ondataavailable = e => chunks.push(e.data);
+        
+        recorder.onstop = () => {
+            const blob = new Blob(chunks, { type: selectedMime });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            const ext = selectedMime.includes('mp4') ? 'mp4' : 'webm';
+            link.download = `Wordsara_Video_${Date.now()}.${ext}`;
+            link.href = url;
+            link.click();
+            l.style.display = 'none';
+        };
+
+        recorder.start();
+
+        let startTime = Date.now();
+        lt.innerText = `RECORDING: 0s / ${duration}s (DO NOT MINIMIZE)`;
+        
+        let drawInterval = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            if (elapsed >= duration) {
+                clearInterval(drawInterval);
+                recorder.stop();
+                return;
+            }
+            lt.innerText = `RECORDING: ${elapsed}s / ${duration}s (DO NOT MINIMIZE)`;
+            ctx.drawImage(staticCanvas, 0, 0);
+        }, 1000 / 30);
+
+      } catch (error) {
+          alert("Video generation failed. Please try again.");
+          l.style.display = 'none';
+          a.style.borderRadius = originalRadius;
+          wrapper.style.transform = originalTransform;
+      }
     }
     
     document.getElementById('mText').oninput = update;
