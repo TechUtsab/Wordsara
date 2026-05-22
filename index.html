@@ -3,584 +3,356 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Wordsara Creator Pro - Gradient Edition</title>
+  <title>Wordsara Studio | Master Edition</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Hind:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Teko:wght@400;600&display=swap"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&family=Poppins:wght@300;400;600;800&family=Hind:wght@400;500;700&family=Mukta:wght@400;700&family=Teko:wght@500;700&display=swap"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  
   <style>
-    :root {
-      --primary-color: #10a37f;
-      --bg-dark: #121212;
-      --panel-bg: #1e1e1e;
-      --border-color: #333;
+    :root { --oled-black: #000000; --neon-green: #39FF14; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.12); }
+    body { background-color: var(--oled-black); color: #fff; font-family: 'Poppins', sans-serif; padding-top: 80px; }
+    
+    .app-bar { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); padding: 0.8rem 2rem; position: fixed; top: 0; width: 100%; z-index: 2000; display: flex; justify-content: space-between; align-items: center; }
+    
+    .main-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; justify-items: center; }
+    @media (min-width: 992px) { .main-grid { grid-template-columns: 1fr 1fr; align-items: start; } }
+
+    .control-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid var(--glass-border); border-radius: 28px; padding: 2rem; width: 100%; max-width: 500px; }
+    .section-label { color: var(--neon-green); font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 0.8rem; text-transform: uppercase; }
+    .section-label i { margin-right: 8px; color: #fff; }
+
+    .color-palette { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 15px; }
+    .color-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: 0.3s; }
+    .color-btn:hover { transform: scale(1.1); border-color: #fff; }
+
+    .big-editor { background: rgba(0,0,0,0.5) !important; border: 1px solid var(--glass-border) !important; color: #fff !important; border-radius: 15px; font-size: 1.1rem; padding: 1.2rem !important; }
+
+    .preview-stage { width: 100%; display: flex; justify-content: center; align-items: center; }
+    .studio-border-wrapper { 
+      padding: 12px; 
+      background: #111; 
+      border: 2px solid var(--neon-green); 
+      border-radius: 24px; 
+      box-shadow: 0 0 40px rgba(57, 255, 20, 0.15);
+      display: inline-block;
     }
 
-    body {
-      background-color: var(--bg-dark);
-      font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
-      padding-top: 70px;
-      color: #fff;
-    }
-
-    /* --- Navbar --- */
-    .app-bar {
-      background: rgba(30, 30, 30, 0.95);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border-color);
-      padding: 0.75rem 1.5rem;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .brand-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--primary-color);
-    }
-
-    /* --- Layout --- */
-    .main-container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    /* Controls Panel */
-    .controls-wrapper {
-      background: var(--panel-bg);
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-    }
-
-    .accordion-button:not(.collapsed) {
-      background-color: rgba(16, 163, 127, 0.1) !important;
-      color: var(--primary-color) !important;
-      box-shadow: none;
+    .preview-box { background: #000; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 14px; }
+    .reel-frame { width: 340px; height: 604px; }
+    .square-frame { width: 400px; height: 400px; }
+    
+    /* FIX: Image Quality Fix using native HTML <img> */
+    .bg-layer { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+    #realBgImg { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+      object-position: center; 
+      display: none; 
+      transition: transform 0.1s, filter 0.1s, opacity 0.1s; 
     }
     
-    .accordion-button:focus { box-shadow: none; }
-    .accordion-item { border-color: var(--border-color); }
-    .accordion-button { color: #fff; background: transparent; }
+    .overlay-dim { position: absolute; inset: 0; z-index: 1; }
+    .content-area { position: relative; z-index: 10; width: 80%; display: flex; flex-direction: column; }
+    .main-text { line-height: 1.6; text-shadow: 0 2px 10px #000; white-space: pre-wrap; word-wrap: break-word; }
+    .author-meta { margin-top: 20px; font-weight: 700; opacity: 0.9; text-align: right; width: 100%; }
 
-    .form-control, .form-select, .input-group-text {
-      background-color: #2b2b2b;
-      border: 1px solid #444;
-      color: #fff;
-    }
-    .form-control:focus {
-      border-color: var(--primary-color);
-      box-shadow: none;
-    }
+    .branding-footer { position: absolute; z-index: 10; text-align: center; width: 100%; }
+    .reel-frame .branding-footer { bottom: 120px; } 
+    .square-frame .branding-footer { bottom: 40px; }
 
-    .btn-custom {
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      font-weight: 600;
-    }
-    .btn-custom:hover { background: #0d8466; color: white; }
+    .fixed-watermark { font-size: 11px; color: #ffffff; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0px; letter-spacing: 0.5px; }
+    .brand-icons { color: #FFFF00; display: flex; gap: 2px; font-size: 12px; margin-right: 2px; }
 
-    /* --- Preview Area --- */
-    .preview-sticky-wrapper {
-      position: sticky;
-      top: 90px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+    .btn-group-custom .btn { border: 1px solid var(--glass-border); color: #fff; background: rgba(255,255,255,0.05); }
+    .btn-group-custom .btn.active { background: var(--neon-green); color: #000; }
+    .btn-export { background: linear-gradient(45deg, var(--neon-green), #24f000); color: #000; font-weight: 800; border: none; padding: 1.1rem; border-radius: 15px; width: 100%; transition: 0.3s; margin-top: 10px; }
 
-    .preview-container {
-      width: 100%;
-      max-width: 360px;
-      aspect-ratio: 9 / 16;
-      background: #000000;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-      border: 1px solid #333;
-      display: flex;
-      flex-direction: column; 
-    }
-
-    .bg-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: #000;
-      opacity: 0; 
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .content-wrapper {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      height: 100%;
-      padding: 40px 25px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    /* --- Author Image Fixed Size (Small) --- */
-    .author-img-container {
-      width: 60px; /* Reduced to 60px as requested */
-      height: 60px;
-      border-radius: 50%;
-      -webkit-mask-image: -webkit-radial-gradient(white, black);
-      mask-image: radial-gradient(white, black);
-      overflow: hidden;
-      border: 2px solid rgba(255,255,255,0.3);
-      margin-bottom: 20px;
-      display: none;
-      background: #000;
-      flex-shrink: 0; /* Prevents squishing */
-    }
-
-    .preview-author-img { width: 100%; height: 100%; object-fit: cover; }
-
-    .text-block-wrapper {
-      display: flex;
-      flex-direction: column;
-      width: fit-content; 
-      max-width: 100%;
-    }
-
-    .preview-text {
-      white-space: pre-wrap;
-      overflow-wrap: break-word;
-      line-height: 1.6;
-      text-align: center; 
-      text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* --- GRADIENT TEXT CLASS --- */
-    .text-gradient-active {
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      /* Note: Text-shadow must be none for gradient to show nicely, 
-         or use filter drop-shadow */
-    }
-
-    .preview-author-name {
-      align-self: flex-end; 
-      margin-top: 10px;
-      opacity: 0.95;
-      font-size: 0.9em;
-      text-align: right;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    /* --- NEW LOGO POSITION (Flow Layout) --- */
-    .preview-logo {
-      position: relative; /* Part of the flow now */
-      display: block;
-      width: 65px; 
-      opacity: 0.9;
-      z-index: 3;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
-      
-      /* "After 2 Paragraph Margin" Logic */
-      margin-top: 50px; 
-    }
-
-    /* Loading */
-    .loading-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.9);
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: var(--primary-color);
-      backdrop-filter: blur(5px);
-    }
+    #loader { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; }
     
-    .spinner-border { width: 4rem; height: 4rem; border-width: 4px; }
-    .loading-text { margin-top: 15px; font-size: 1.2rem; color: white; font-weight: 500; }
-
-    .btn-tool { border: 1px solid #444; color: #ccc; }
-    .btn-tool.active { background-color: var(--primary-color); border-color: var(--primary-color); color: white; }
-    .range-value { font-size: 0.8rem; color: #888; }
-    .iro-center { display: flex; justify-content: center; margin: 10px 0; }
+    .custom-range::-webkit-slider-thumb { background: var(--neon-green); }
+    .custom-range::-moz-range-thumb { background: var(--neon-green); }
   </style>
 </head>
 <body>
 
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="spinner-border" role="status"></div>
-    <div class="loading-text">Generating Image...</div>
-  </div>
+  <div id="loader"><div class="spinner-border text-success mb-3"></div><h6 class="text-white fw-bold" id="loaderText">STUDIO RENDERING...</h6></div>
 
   <nav class="app-bar">
-    <div class="d-flex align-items-center">
-      <i class="fa-solid fa-pen-nib me-2 text-success"></i>
-      <span class="brand-title">Wordsara Creator</span>
-    </div>
-    <button class="btn btn-sm btn-outline-light" onclick="location.reload()">Reset</button>
+    <div class="fw-bold h4 mb-0"><i class="fa-solid fa-pen-ruler me-2"></i>WORDSARA <span style="color:var(--neon-green)">STUDIO</span></div>
+    <button class="btn btn-outline-success border-0 fs-5" onclick="location.reload()" aria-label="Reload App"><i class="fa-solid fa-arrows-rotate"></i></button>
   </nav>
 
-  <div class="container-fluid main-container">
-    <div class="row g-4">
+  <div class="main-grid">
+    <div class="control-panel">
+      <!-- 1. Text Designer -->
+      <div class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <p class="section-label m-0"><i class="fa-solid fa-file-pen"></i>Content Designer</p>
+            <button class="text-danger border-0 bg-transparent" onclick="clearAllText()" aria-label="Clear Text"><i class="fa-solid fa-trash-can"></i></button>
+        </div>
+        <textarea class="form-control big-editor" id="mText" rows="4">ख्वाहिशों से नहीं गिरते [color=#39FF14]फूल[/color] झोली में, कर्म की शाख को हिलाना होगा।</textarea>
+        <div class="color-palette">
+          <div class="color-btn" style="background: #39FF14;" onmousedown="event.preventDefault(); applyColor('#39FF14')" ontouchstart="event.preventDefault(); applyColor('#39FF14')"></div>
+          <div class="color-btn" style="background: #FF0000;" onmousedown="event.preventDefault(); applyColor('#FF0000')" ontouchstart="event.preventDefault(); applyColor('#FF0000')"></div>
+          <div class="color-btn" style="background: #00D2FF;" onmousedown="event.preventDefault(); applyColor('#00D2FF')" ontouchstart="event.preventDefault(); applyColor('#00D2FF')"></div>
+          <div class="color-btn" style="background: #FF00FF;" onmousedown="event.preventDefault(); applyColor('#FF00FF')" ontouchstart="event.preventDefault(); applyColor('#FF00FF')"></div>
+          <div class="color-btn" style="background: #FFFF00;" onmousedown="event.preventDefault(); applyColor('#FFFF00')" ontouchstart="event.preventDefault(); applyColor('#FFFF00')"></div>
+          <div class="color-btn" style="background: #FFAC1C;" onmousedown="event.preventDefault(); applyColor('#FFAC1C')" ontouchstart="event.preventDefault(); applyColor('#FFAC1C')"></div>
+          <div class="color-btn" style="background: #ffffff;" onmousedown="event.preventDefault(); applyColor('#ffffff')" ontouchstart="event.preventDefault(); applyColor('#ffffff')"></div>
+        </div>
+      </div>
+
+      <!-- 2. Typography -->
+      <div class="row g-3 mb-4">
+        <div class="col-6">
+          <p class="section-label"><i class="fa-solid fa-spell-check"></i>Typography</p>
+          <select class="form-select" id="mFont" onchange="update()">
+            <option value="'Hind', sans-serif" selected>Hind (Professional)</option>
+            <option value="'Noto Sans Devanagari', sans-serif">Noto Sans (Modern)</option>
+            <option value="'Mukta', sans-serif">Mukta (Clean)</option>
+            <option value="'Teko', sans-serif">Teko (Stylized)</option>
+            <option value="'Poppins', sans-serif">Poppins (English Best)</option>
+          </select>
+        </div>
+        <div class="col-6">
+            <p class="section-label"><i class="fa-solid fa-bold"></i>Style</p>
+            <button class="btn btn-outline-secondary w-100" id="boldToggle" onclick="toggleBold()"><i class="fa-solid fa-bold"></i> BOLD</button>
+        </div>
+      </div>
+
+      <!-- 3. Alignment & Size -->
+      <div class="row g-3 mb-4">
+        <div class="col-6"><p class="section-label"><i class="fa-solid fa-align-center"></i>Align</p>
+          <div class="btn-group btn-group-custom w-100">
+            <button class="btn btn-sm" id="align-left" onclick="setAlign('left', this)"><i class="fa-solid fa-align-left"></i></button>
+            <button class="btn btn-sm active" id="align-center" onclick="setAlign('center', this)"><i class="fa-solid fa-align-center"></i></button>
+            <button class="btn btn-sm" id="align-right" onclick="setAlign('right', this)"><i class="fa-solid fa-align-right"></i></button>
+          </div>
+        </div>
+        <div class="col-6"><p class="section-label"><i class="fa-solid fa-text-height"></i>Size</p><input type="number" class="form-control" id="mSize" value="15" oninput="update()"></div>
+      </div>
+
+      <!-- 4. Ratio & Global Dim -->
+      <div class="row g-3 mb-4">
+        <div class="col-6"><p class="section-label"><i class="fa-solid fa-crop-simple"></i>Ratio</p>
+          <select class="form-select" id="mFrame" onchange="update()"><option value="reel-frame">9:16 Reel</option><option value="square-frame">1:1 Post</option></select>
+        </div>
+        <div class="col-6"><p class="section-label"><i class="fa-solid fa-moon"></i>Text Dim</p><input type="number" class="form-control" id="mDim" value="5" min="0" max="9" oninput="update()"></div>
+      </div>
+
+      <!-- 5. Author Name -->
+      <div class="mb-4"><p class="section-label"><i class="fa-solid fa-user-edit"></i>Author Name</p><input type="text" class="form-control" id="mAuth" placeholder="Your Name" oninput="update()"></div>
       
-      <div class="col-lg-7 col-md-6">
-        <div class="controls-wrapper">
-          <div class="accordion" id="toolsAccordion">
-            
-            <div class="accordion-item">
-              <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelText">Typography & Colors</button></h2>
-              <div id="panelText" class="accordion-collapse collapse show" data-bs-parent="#toolsAccordion">
-                <div class="accordion-body">
-                  <div class="mb-3">
-                     <textarea class="form-control" id="textInput" rows="4">लोग कहते है [color=#FF0000]कुछ[/color] अपने दिल की सुनाओ..</textarea>
-                  </div>
-                  
-                  <div class="row g-3 align-items-center mb-3">
-                    <div class="col-12">
-                      <div class="form-check form-switch p-0 d-flex gap-2 align-items-center">
-                        <label class="form-check-label fw-bold text-warning">Enable Gradient Text</label>
-                        <input class="form-check-input ms-2" type="checkbox" role="switch" id="gradientToggle">
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="row g-2 mb-3">
-                    <div class="col-6">
-                      <label class="small text-muted">Primary Color</label>
-                      <input type="color" class="form-control form-control-color w-100" id="textColorPicker" value="#ffffff">
-                    </div>
-                    <div class="col-6" id="gradientColorDiv" style="display:none;">
-                      <label class="small text-muted">Gradient End Color</label>
-                      <input type="color" class="form-control form-control-color w-100" id="gradientColorPicker" value="#10a37f">
-                    </div>
-                  </div>
-
-                  <div class="row g-2">
-                    <div class="col-12">
-                      <label>Font Family</label>
-                      <select class="form-select" id="fontFamilySelect">
-                        <option value="'Noto Sans Devanagari', sans-serif">Hindi (Noto)</option>
-                        <option value="'Mukta', sans-serif">Hindi (Mukta)</option>
-                        <option value="'Poppins', sans-serif">English (Poppins)</option>
-                        <option value="'Teko', sans-serif">Headlines (Teko)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div class="mt-3">
-                    <label>Size: <span id="val-size">14px</span></label>
-                    <input type="range" class="form-range" id="fontSizeRange" min="10" max="60" value="14">
-                  </div>
-                  
-                  <div class="d-flex gap-2 mt-3">
-                     <input type="checkbox" class="btn-check" id="boldToggle">
-                     <label class="btn btn-outline-secondary btn-sm" for="boldToggle">Bold</label>
-                     
-                     <input type="checkbox" class="btn-check" id="shadowToggle">
-                     <label class="btn btn-outline-secondary btn-sm" for="shadowToggle">Shadow</label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="accordion-item">
-              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelAlign">Layout</button></h2>
-              <div id="panelAlign" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
-                <div class="accordion-body">
-                  <div class="btn-group w-100 mb-3">
-                    <button class="btn btn-tool" onclick="setTextAlign('left', this)"><i class="fa-solid fa-align-left"></i></button>
-                    <button class="btn btn-tool active" onclick="setTextAlign('center', this)"><i class="fa-solid fa-align-center"></i></button>
-                    <button class="btn btn-tool" onclick="setTextAlign('right', this)"><i class="fa-solid fa-align-right"></i></button>
-                  </div>
-                  <div class="btn-group w-100 mb-3">
-                     <button class="btn btn-tool" onclick="setYAlign('flex-start', this)">Top</button>
-                     <button class="btn btn-tool active" onclick="setYAlign('center', this)">Middle</button>
-                     <button class="btn btn-tool" onclick="setYAlign('flex-end', this)">Bottom</button>
-                  </div>
-                  <div class="btn-group w-100">
-                     <button class="btn btn-tool active" onclick="setFrame('reel', this)">Reel (9:16)</button>
-                     <button class="btn btn-tool" onclick="setFrame('square', this)">Square (1:1)</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="accordion-item">
-              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelBg">Background</button></h2>
-              <div id="panelBg" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
-                <div class="accordion-body">
-                   <ul class="nav nav-tabs mb-3" id="bgTab">
-                     <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabColor">Color</button></li>
-                     <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabImg">Image</button></li>
-                   </ul>
-                   
-                   <div class="tab-content">
-                     <div class="tab-pane fade show active" id="tabColor">
-                       <div id="iroPicker" class="iro-center"></div>
-                     </div>
-                     <div class="tab-pane fade" id="tabImg">
-                       <input type="file" class="form-control mb-3" id="bgImgInput" accept="image/*">
-                       <label>Dark Overlay: <span id="val-overlay">0%</span></label>
-                       <input type="range" class="form-range" id="overlayRange" min="0" max="0.9" step="0.1" value="0">
-                     </div>
-                   </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="accordion-item">
-              <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelAuthor">Author</button></h2>
-              <div id="panelAuthor" class="accordion-collapse collapse" data-bs-parent="#toolsAccordion">
-                <div class="accordion-body">
-                   <input type="text" class="form-control mb-2" id="authorName" placeholder="Author Name">
-                   <input type="file" class="form-control" id="authorImgInput" accept="image/*">
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="p-3 bg-dark border-top border-secondary">
-             <button class="btn btn-custom w-100 py-3" onclick="downloadImage()">
-               <i class="fa-solid fa-download me-2"></i> Download HD Image
-             </button>
-             <div class="text-center mt-2 text-muted small">Generates 4x Ultra HD PNG</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-5 col-md-6">
-        <div class="preview-sticky-wrapper">
-          <div class="text-muted mb-2 small"><i class="fa-regular fa-eye"></i> Live Preview</div>
+      <!-- 6. Background Image & Dynamic Controls -->
+      <div class="mb-4">
+        <p class="section-label"><i class="fa-solid fa-image"></i>Background</p>
+        <input type="file" class="form-control" id="mBg" accept="image/*">
+        
+        <div id="bgControls" class="mt-3 p-3" style="display: none; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);">
+          <p class="section-label text-warning mb-3"><i class="fa-solid fa-sliders"></i> Image Tuning</p>
           
-          <div id="preview" class="preview-container">
-            <div class="bg-overlay" id="previewOverlay"></div>
-            
-            <div class="content-wrapper" id="contentWrapper">
-               <div id="authorImgContainer" class="author-img-container">
-                 <img id="prevAuthorImg" class="preview-author-img">
-               </div>
-               
-               <div class="text-block-wrapper">
-                  <div id="prevText" class="preview-text"></div>
-                  <div id="prevAuthorName" class="preview-author-name"></div>
-               </div>
+          <label class="form-label text-light mb-0" style="font-size: 0.8rem;">Zoom In/Out</label>
+          <input type="range" class="form-range custom-range mb-2" id="mZoom" min="1" max="3" step="0.05" value="1" oninput="update()">
+          
+          <label class="form-label text-light mb-0" style="font-size: 0.8rem;">Blur (Clear to Blurred)</label>
+          <input type="range" class="form-range custom-range mb-2" id="mBlur" min="0" max="25" step="1" value="0" oninput="update()">
 
-               <img src="wordsara_logoo.png" class="preview-logo" onerror="this.style.display='none'">
-            </div>
-          </div>
+          <label class="form-label text-light mb-0" style="font-size: 0.8rem;">Visibility (Opacity)</label>
+          <input type="range" class="form-range custom-range" id="mOpacity" min="0.1" max="1" step="0.1" value="1" oninput="update()">
         </div>
       </div>
+      
+      <p class="section-label"><i class="fa-solid fa-wand-magic-sparkles"></i>Export Quality</p>
+      <select class="form-select mb-3" id="mQuality">
+        <option value="4" selected>4K Resolution</option>
+        <option value="8">8K Master</option>
+        <option value="16">16K Extreme</option>
+      </select>
+      
+      <button class="btn btn-export" onclick="exportImg()"><i class="fa-solid fa-download me-2"></i> DOWNLOAD STUDIO IMAGE</button>
+    </div>
 
+    <!-- 7. Preview Stage -->
+    <div class="preview-stage">
+      <div class="studio-border-wrapper">
+        <div class="preview-box reel-frame" id="exportArea">
+          
+          <!-- FIX: Added native img tag instead of css background -->
+          <div class="bg-layer" id="bgLayer">
+            <img id="realBgImg" src="" alt="Background">
+          </div>
+          
+          <div class="overlay-dim" id="dimmer"></div>
+          <div class="content-area">
+            <div class="main-text" id="pText" style="text-align: center;"></div>
+            <div class="author-meta" id="pAuthName"></div>
+          </div>
+          
+          <div class="branding-footer">
+            <div class="fixed-watermark">
+              <div class="brand-icons"><i class="fa-brands fa-instagram"></i><i class="fa-brands fa-youtube"></i></div><span>wordsara</span>
+            </div>
+          </div>
+          
+        </div>
+      </div>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
-
   <script>
-    // --- Variables ---
-    let bgImageSrc = null;
-    let colorPicker = new iro.ColorPicker("#iroPicker", { width: 180, color: "#000000" });
+    let bgData = null, currentAlign = 'center', isBold = false;
 
-    // --- Init ---
-    document.addEventListener('DOMContentLoaded', () => {
-      updatePreview();
-    });
+    window.onload = () => {
+      const savedText = localStorage.getItem('wordsara_text');
+      const savedAuth = localStorage.getItem('wordsara_auth');
+      if (savedText) document.getElementById('mText').value = savedText;
+      if (savedAuth) document.getElementById('mAuth').value = savedAuth;
+      update();
+    };
 
-    // --- Event Listeners ---
-    document.querySelectorAll('input, select, textarea').forEach(el => {
-      el.addEventListener('input', updatePreview);
-    });
-
-    // Toggle for Gradient Inputs
-    document.getElementById('gradientToggle').addEventListener('change', function() {
-       document.getElementById('gradientColorDiv').style.display = this.checked ? 'block' : 'none';
-       updatePreview();
-    });
-
-    colorPicker.on('color:change', function(color) {
-      if(!bgImageSrc) document.getElementById('preview').style.background = color.hexString;
-    });
-
-    document.getElementById('bgImgInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if(file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          bgImageSrc = evt.target.result;
-          updatePreview();
-        };
-        reader.readAsDataURL(file);
+    function clearAllText() { 
+      document.getElementById('mText').value = ""; 
+      localStorage.removeItem('wordsara_text');
+      update(); 
+    }
+    
+    function toggleBold() { isBold = !isBold; document.getElementById('boldToggle').classList.toggle('active', isBold); update(); }
+    
+    function applyColor(hex) {
+      const el = document.getElementById('mText');
+      const start = el.selectionStart, end = el.selectionEnd;
+      if (start !== end) {
+        el.value = el.value.substring(0, start) + `[color=${hex}]` + el.value.substring(start, end) + `[/color]` + el.value.substring(end);
+        update();
       }
-    });
+    }
+    
+    function setAlign(align, btn) {
+      currentAlign = align;
+      document.querySelectorAll('.btn-group-custom .btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active'); update();
+    }
 
-    document.getElementById('authorImgInput').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if(file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const img = document.getElementById('prevAuthorImg');
-          const container = document.getElementById('authorImgContainer');
-          img.src = evt.target.result;
-          container.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // --- Core Function ---
-    function updatePreview() {
-      const text = document.getElementById('textInput').value;
-      const font = document.getElementById('fontFamilySelect').value;
-      const size = document.getElementById('fontSizeRange').value;
+    function update() {
+      const text = document.getElementById('mText').value;
+      const size = parseInt(document.getElementById('mSize').value) || 15;
+      const font = document.getElementById('mFont').value;
+      const auth = document.getElementById('mAuth').value;
+      const dim = document.getElementById('mDim').value;
+      const frame = document.getElementById('mFrame').value;
       
-      const color1 = document.getElementById('textColorPicker').value;
-      const color2 = document.getElementById('gradientColorPicker').value;
-      const useGradient = document.getElementById('gradientToggle').checked;
+      localStorage.setItem('wordsara_text', text);
+      localStorage.setItem('wordsara_auth', auth);
 
-      const isBold = document.getElementById('boldToggle').checked;
-      const hasShadow = document.getElementById('shadowToggle').checked;
-      const overlayOp = document.getElementById('overlayRange').value;
-      const author = document.getElementById('authorName').value;
-
-      document.getElementById('val-size').innerText = size + 'px';
-      document.getElementById('val-overlay').innerText = Math.round(overlayOp*100) + '%';
-
-      const pText = document.getElementById('prevText');
-      const pContainer = document.getElementById('preview');
-      const pOverlay = document.getElementById('previewOverlay');
-      const pAuthor = document.getElementById('prevAuthorName');
-
-      // 1. Text Parsing & Gradient Logic
-      let formattedText = text.replace(/\[color=(.*?)\](.*?)\[\/color\]/g, '<span style="color:$1">$2</span>');
-      pText.innerHTML = formattedText;
+      const area = document.getElementById('exportArea');
+      area.className = `preview-box ${frame}`;
       
+      document.getElementById('dimmer').style.background = `rgba(0,0,0, 0.${dim})`;
+      
+      const pText = document.getElementById('pText');
+      const escapedText = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+      pText.innerHTML = escapedText.replace(
+        /\[color=(#[0-9A-Fa-f]{6})\](.*?)\[\/color\]/g,
+        '<span style="color:$1">$2</span>'
+      );
+      
+      pText.style.fontSize = size + "px";
+      pText.style.textAlign = currentAlign;
       pText.style.fontFamily = font;
-      pText.style.fontSize = size + 'px';
-      pText.style.fontWeight = isBold ? '700' : '400';
-
-      if(useGradient) {
-        pText.classList.add('text-gradient-active');
-        pText.style.backgroundImage = `linear-gradient(45deg, ${color1}, ${color2})`;
-        pText.style.color = 'transparent'; // Fallback
-      } else {
-        pText.classList.remove('text-gradient-active');
-        pText.style.backgroundImage = 'none';
-        pText.style.color = color1;
-      }
+      pText.style.fontWeight = isBold ? "700" : "400";
       
-      // Shadow Logic (Conflict handling with Gradient)
-      if(hasShadow) {
-        if(useGradient) {
-          // Use Filter for gradient text
-          pText.style.filter = "drop-shadow(2px 2px 4px rgba(0,0,0,0.6))";
-          pText.style.textShadow = "none";
-        } else {
-          pText.style.filter = "none";
-          pText.style.textShadow = "0px 2px 10px rgba(0,0,0,0.7)";
-        }
+      const pAuth = document.getElementById('pAuthName');
+      pAuth.innerText = auth ? `~ ${auth}` : "";
+      pAuth.style.fontSize = (size - 2) + "px";
+      pAuth.style.fontFamily = font;
+      pAuth.style.fontWeight = isBold ? "700" : "400";
+
+      // FIX: Use native image element instead of background-image for crisp exports
+      const realBgImg = document.getElementById('realBgImg');
+      if(bgData) {
+        const zoom = document.getElementById('mZoom').value;
+        const blur = document.getElementById('mBlur').value;
+        const opacity = document.getElementById('mOpacity').value;
+        
+        realBgImg.style.display = 'block';
+        realBgImg.src = bgData;
+        realBgImg.style.transform = `scale(${zoom})`;
+        realBgImg.style.filter = `blur(${blur}px)`;
+        realBgImg.style.opacity = opacity;
       } else {
-        pText.style.textShadow = "none";
-        pText.style.filter = "none";
+        realBgImg.style.display = 'none';
+        realBgImg.src = '';
+      }
+    }
+
+    document.getElementById('mBg').onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) {
+        document.getElementById('bgControls').style.display = 'none';
+        bgData = null;
+        update();
+        return;
       }
 
-      // 2. Background
-      if(bgImageSrc) {
-        pContainer.style.background = `url(${bgImageSrc}) center/cover no-repeat`;
-        pOverlay.style.opacity = overlayOp;
-      } else {
-        pContainer.style.background = colorPicker.color.hexString;
-        pOverlay.style.opacity = 0;
-      }
+      const fr = new FileReader();
+      fr.onload = () => {
+        bgData = fr.result;
+        
+        document.getElementById('bgControls').style.display = 'block';
+        document.getElementById('mZoom').value = 1;
+        document.getElementById('mBlur').value = 0;
+        document.getElementById('mOpacity').value = 1;
+        
+        update();
+      };
+      fr.onerror = () => alert("Image loading failed.");
+      fr.readAsDataURL(file);
+    };
 
-      // 3. Author Info
-      pAuthor.innerText = author ? `~ ${author}` : "";
-      pAuthor.style.color = color1; // Author always takes primary color
-      pAuthor.style.fontFamily = font;
-    }
+    async function exportImg() {
+      const l = document.getElementById('loader'), a = document.getElementById('exportArea');
+      const lt = document.getElementById('loaderText');
+      const q = parseInt(document.getElementById('mQuality').value);
+      
+      l.style.display = 'flex';
+      if(q >= 8) lt.innerText = "RENDERING " + q + "K QUALITY (PLEASE WAIT)...";
+      
+      const originalRadius = a.style.borderRadius;
+      a.style.borderRadius = "0px";
 
-    // --- Helpers ---
+      const safeScale = Math.min(q, 4);
 
-    function setTextAlign(align, btn) {
-      document.getElementById('prevText').style.textAlign = align;
-      const wrapper = document.getElementById('contentWrapper');
-      if(align === 'center') wrapper.style.alignItems = 'center';
-      else if(align === 'right') wrapper.style.alignItems = 'flex-end';
-      else wrapper.style.alignItems = 'flex-start';
-      setActive(btn);
-    }
-
-    function setYAlign(align, btn) {
-      document.getElementById('contentWrapper').style.justifyContent = align;
-      setActive(btn);
-    }
-
-    function setFrame(type, btn) {
-      const p = document.getElementById('preview');
-      if(type === 'reel') { p.style.aspectRatio = "9/16"; p.style.maxWidth="360px"; }
-      else { p.style.aspectRatio = "1/1"; p.style.maxWidth="360px"; }
-      setActive(btn);
-    }
-
-    function setActive(btn) {
-      btn.parentNode.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    function addHighlight() {
-      const textarea = document.getElementById('textInput');
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      if (start === end) return;
-      const text = textarea.value;
-      const sel = text.substring(start, end);
-      textarea.value = text.substring(0, start) + `[color=#FFD700]${sel}[/color]` + text.substring(end);
-      updatePreview();
-    }
-
-    function downloadImage() {
-      const loader = document.getElementById('loadingOverlay');
-      loader.style.display = 'flex';
-      const previewElement = document.getElementById('preview');
-
-      previewElement.style.border = 'none';
-
-      setTimeout(() => {
-        html2canvas(previewElement, {
-          scale: 4, 
-          useCORS: true,
-          backgroundColor: null,
-          logging: false,
-          allowTaint: true
-        }).then(canvas => {
-          previewElement.style.border = ''; 
-
+      setTimeout(async () => {
+        try {
+          const canvas = await html2canvas(a, { 
+            scale: safeScale,
+            useCORS: true,
+            backgroundColor: "#000000",
+            logging: false
+          });
           const link = document.createElement('a');
-          link.download = 'wordsara_gradient.png';
-          link.href = canvas.toDataURL('image/png', 1.0);
+          link.download = `Wordsara_${q}K_${Date.now()}.png`;
+          link.href = canvas.toDataURL("image/png", 1.0);
           link.click();
-          loader.style.display = 'none';
-        }).catch(err => {
-          previewElement.style.border = '';
-          console.error(err);
-          alert('Error generating image.');
-          loader.style.display = 'none';
-        });
+        } catch(e) {
+            alert("Export failed. Device memory low for " + q + "K. Try 4K.");
+        } finally { 
+          a.style.borderRadius = originalRadius; 
+          l.style.display = 'none'; 
+          lt.innerText = "STUDIO RENDERING...";
+        }
       }, 800);
     }
+    
+    document.getElementById('mText').oninput = update;
+    update();
   </script>
 </body>
 </html>
